@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>navtest</title></head>
+<body>
+<pre id="out">running…</pre>
+<iframe id="f" src="/index.html?app=1" width="420" height="800"></iframe>
+<script>
+var results = [];
+function assertScreen(doc, id, label){
+  var active = doc.querySelector(".screen.active");
+  var ok = active && active.id === id;
+  results.push((ok ? "PASS" : "FAIL") + " " + label + " → " + (active ? active.id : "none") + (ok ? "" : " (expected " + id + ")"));
+  return ok;
+}
+function click(doc, sel){
+  var el = doc.querySelector(sel);
+  if (!el) { results.push("FAIL click: missing " + sel); return; }
+  el.click();
+}
+document.getElementById("f").addEventListener("load", function(){
+  var doc = this.contentDocument;
+  setTimeout(function(){
+    assertScreen(doc, "s-disclaimer", "載入自動推進");
+    click(doc, '[data-go="s-gap"]');           assertScreen(doc, "s-gap", "免責→缺口引導");
+    click(doc, '[data-go="s-goal"]');          assertScreen(doc, "s-goal", "引導→目標");
+    click(doc, '[data-go="s-invest"]');        assertScreen(doc, "s-invest", "目標→投入");
+    click(doc, '[data-go="s-target"]');        assertScreen(doc, "s-target", "投入→標的");
+    click(doc, "#pickStock");
+    click(doc, "#startCalc");                  assertScreen(doc, "s-result-stock", "個股→確定性結果");
+    var tabbarVisible = doc.querySelector(".tabbar").style.display !== "none";
+    results.push((tabbarVisible ? "PASS" : "FAIL") + " tabbar 在結果頁顯示");
+    click(doc, '.tabbar [data-tab="track"]');  assertScreen(doc, "s-track", "tab→追蹤");
+    click(doc, '.tabbar [data-tab="settings"]'); assertScreen(doc, "s-settings", "tab→設定");
+    click(doc, '.tabbar [data-tab="calc"]');   assertScreen(doc, "s-result-etf", "tab→試算(ETF)");
+    click(doc, "#modeAdv"); /* 切到進階模式 */
+    var fl0 = doc.getElementById("failLink");
+    var hiddenByDefault = fl0.hidden && doc.defaultView.getComputedStyle(fl0).display === "none";
+    results.push((hiddenByDefault ? "PASS" : "FAIL") + " 預設投入下連結不渲染(rendered state,非僅 DOM property)");
+    var adv = doc.getElementById("advRange");
+    adv.value = 6000;
+    adv.dispatchEvent(new Event("input", {bubbles: true}));
+    adv.dispatchEvent(new Event("change", {bubbles: true}));
+    assertScreen(doc, "s-result-etf", "投入過低不自動跳頁(WCAG 3.2.2)");
+    var fl = doc.getElementById("failLink");
+    results.push((fl && !fl.hidden ? "PASS" : "FAIL") + " 低投入→顯示「查看調整建議」連結");
+    fl.click();                                assertScreen(doc, "s-fail", "點連結→無法達標");
+    click(doc, '#s-fail [data-go="s-invest"]'); assertScreen(doc, "s-invest", "無法達標→調整計畫");
+    var pass = results.filter(function(r){ return r.indexOf("FAIL") === 0; }).length === 0;
+    document.getElementById("out").textContent =
+      "NAVTEST " + (pass ? "ALL-PASS" : "HAS-FAIL") + "\n" + results.join("\n");
+  }, 2000);
+});
+</script>
+</body>
+</html>

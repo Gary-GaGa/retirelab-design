@@ -17,8 +17,8 @@
   --paper:#F1F4F0;        /* N1  passbook-paper */
   --surf:#FFFFFF;         /* SURF card-paper */
   --ink:#16211C;          /* N2  ledger-ink */
-  --ink-soft:#16211CB3;   /* N2 @70% */
-  --ink-faint:#16211C73;  /* N2 @45% */
+  --ink-soft:#16211CC7;   /* N2 @78% — ≥7.6:1 on light surfaces */
+  --ink-faint:#16211CA6;  /* N2 @65% — ≥4.96:1, clears AA for small text */
   --rule:#D4DAD3;         /* N3  rule-line */
   --a1:#0E5C48;           /* A1  passbook-green · P50 */
   --a2:#0A3B30;           /* A2  ledger-green-deep · P10 */
@@ -37,8 +37,8 @@
   --paper:#0C1512;        /* N1D ink-bg */
   --surf:#12201B;         /* SURFD card-ink */
   --ink:#E7EDE9;          /* N2D paper-fg */
-  --ink-soft:#E7EDE9B3;
-  --ink-faint:#E7EDE973;
+  --ink-soft:#E7EDE9C7;
+  --ink-faint:#E7EDE9A6;
   --rule:#26332D;         /* N3D rule-dark */
   --a1:#3AA886;           /* A1D green-lamp · P50 */
   --band:#3AA88640;       /* A1D @25% fan fill on dark */
@@ -86,6 +86,15 @@ nav.screens button[aria-current="true"]{
 }
 nav.screens button[aria-current="true"] .no{color:var(--a1)}
 .stage{flex:1;display:flex;justify-content:center}
+.app-mode nav.screens{display:none}
+.demo-bar .seg{width:auto;flex:0 0 auto}
+.demo-bar .seg button{min-width:88px;padding:0 14px}
+.tabbar{display:none;border-top:1px solid var(--rule);background:var(--surf)}
+.app-mode .tabbar{display:flex}
+.tabbar button{
+  flex:1;min-height:52px;font-size:12.5px;font-weight:600;color:var(--ink-soft);
+}
+.tabbar button[aria-current="true"]{color:var(--a1)}
 .phone{
   width:390px;max-width:100%;min-height:760px;background:var(--paper);
   border:1px solid var(--rule);border-radius:12px;overflow:hidden;
@@ -174,6 +183,7 @@ nav.screens button[aria-current="true"] .no{color:var(--a1)}
   font-family:var(--mono);font-size:13px;background:var(--surf);
 }
 .chips button[aria-pressed="true"]{border-color:var(--a1);background:var(--a1-wash);color:var(--a1);font-weight:700}
+.target-card[aria-pressed="true"]{border-color:var(--a1);box-shadow:0 0 0 1px var(--a1)}
 
 /* amber / error ---------------------------------------------------------- */
 .amber-bar{
@@ -223,6 +233,10 @@ nav.screens button[aria-current="true"] .no{color:var(--a1)}
 input[type="range"]{width:100%;accent-color:var(--a1);height:28px}
 .sim-state{font-size:11.5px;color:var(--ink-faint);font-family:var(--mono)}
 .sim-state.live{color:var(--ink-soft)}
+.fail-link:not([hidden]){
+  display:block;min-height:40px;padding:4px 6px;text-align:left;
+  color:var(--a1);font-size:13px;font-weight:700;text-decoration:underline;
+}
 
 /* guide ------------------------------------------------------------------ */
 .guide{
@@ -289,6 +303,10 @@ footer.demo-foot{
       <div class="sub">v0.2 · 12 畫面 · DESIGN_SPEC「存摺分岔線」</div>
     </div>
     <div class="spacer"></div>
+    <div class="seg" role="group" aria-label="Demo 模式">
+      <button id="dmGallery" aria-pressed="true">瀏覽</button>
+      <button id="dmApp" aria-pressed="false">App 操作</button>
+    </div>
     <button class="theme-toggle" id="themeToggle" aria-pressed="false">深色模式</button>
   </header>
 
@@ -337,8 +355,8 @@ footer.demo-foot{
             </div>
             <p class="caption">本工具依你輸入的條件與歷史資料進行試算,結果僅供參考,不構成投資建議。實際報酬、稅費與法規可能變動;投資有風險,決策前請自行評估或諮詢專業人士。</p>
             <div class="btn-row">
-              <button class="btn primary">我了解,開始試算</button>
-              <button class="btn ghost">先看示範資料</button>
+              <button class="btn primary" data-go="s-gap">我了解,開始試算</button>
+              <button class="btn ghost" data-go="s-result-etf">先看示範資料</button>
             </div>
           </div>
         </section>
@@ -368,7 +386,7 @@ footer.demo-foot{
                 <button aria-pressed="false">5.0%</button>
               </div>
             </div>
-            <div class="btn-row"><button class="btn primary">下一步:設定目標</button></div>
+            <div class="btn-row"><button class="btn primary" data-go="s-goal">下一步:設定目標</button></div>
           </div>
         </section>
 
@@ -389,7 +407,7 @@ footer.demo-foot{
               <div class="row total"><span class="k">目標資產</span><span class="v">NT$ 3,750,000</span></div>
             </div>
             <p class="caption">月支出可依你目前的生活水準調整;之後隨時能在「設定」修改。</p>
-            <div class="btn-row"><button class="btn primary">下一步:投入計畫</button></div>
+            <div class="btn-row"><button class="btn primary" data-go="s-invest">下一步:投入計畫</button></div>
           </div>
         </section>
 
@@ -412,7 +430,7 @@ footer.demo-foot{
               </div>
             </div>
             <p class="caption">投入金額之後可以隨薪資調整;先抓一個做得到的數字。</p>
-            <div class="btn-row"><button class="btn primary">下一步:選擇標的</button></div>
+            <div class="btn-row"><button class="btn primary" data-go="s-target">下一步:選擇標的</button></div>
           </div>
         </section>
 
@@ -422,7 +440,7 @@ footer.demo-foot{
           <div class="body">
             <p style="font-size:15px">兩種標的,兩種誠實:ETF 給你機率,個股只給你單一假設。</p>
 
-            <button class="card" style="text-align:left;padding:16px" aria-pressed="true">
+            <button class="card target-card" id="pickEtf" style="text-align:left;padding:16px" aria-pressed="true">
               <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
                 <strong style="font-size:16px">市值型 ETF</strong>
                 <span class="chip">機率試算</span>
@@ -437,7 +455,7 @@ footer.demo-foot{
               <p class="caption">以 23 年歷史模擬,給出 P90 / P50 / P10 三種情境的退休年齡。</p>
             </button>
 
-            <button class="card" style="text-align:left;padding:16px" aria-pressed="false">
+            <button class="card target-card" id="pickStock" style="text-align:left;padding:16px" aria-pressed="false">
               <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
                 <strong style="font-size:16px">單一個股</strong>
                 <span class="chip stamp">確定性試算</span>
@@ -450,7 +468,7 @@ footer.demo-foot{
               <p class="caption">單一報酬假設、單一條線 — 沒有機率,也不假裝有。附風險揭露。</p>
             </button>
 
-            <div class="btn-row"><button class="btn primary">開始試算</button></div>
+            <div class="btn-row"><button class="btn primary" id="startCalc">開始試算</button></div>
           </div>
         </section>
 
@@ -532,6 +550,7 @@ footer.demo-foot{
                   <div class="lab"><span>每月投入</span><output class="mono" id="advOut">NT$ 15,000</output></div>
                   <input type="range" min="5000" max="50000" step="1000" value="15000" id="advRange" aria-label="每月投入(快速估算)">
                   <span class="sim-state" id="simState">模擬結果 · 1,000 次情境</span>
+                  <button class="fail-link" id="failLink" data-go="s-fail" hidden>以此投入難以達標 — 查看調整建議 →</button>
                 </div>
               </div>
             </div>
@@ -617,7 +636,7 @@ footer.demo-foot{
               <div class="row"><span class="k">延後退休 3 年</span><span class="v">68 歲<small>達標</small></span></div>
               <div class="row"><span class="k">月支出降 5,000</span><span class="v">64 歲<small>達標</small></span></div>
             </div>
-            <div class="btn-row"><button class="btn primary">調整計畫</button></div>
+            <div class="btn-row"><button class="btn primary" data-go="s-invest">調整計畫</button></div>
           </div>
         </section>
 
@@ -731,7 +750,7 @@ footer.demo-foot{
                 </svg>
                 <p style="font-weight:600">還沒有任何試算</p>
                 <p class="caption" style="margin:4px 0 12px">三分鐘,算出你的第一個退休年齡。</p>
-                <button class="btn primary">開始第一筆試算</button>
+                <button class="btn primary" data-go="s-gap">開始第一筆試算</button>
               </div>
             </div>
 
@@ -747,6 +766,12 @@ footer.demo-foot{
 
           </div>
         </section>
+
+        <div class="tabbar" role="tablist" aria-label="App 導覽">
+          <button data-go="s-result-etf" data-tab="calc" aria-current="true">試算</button>
+          <button data-go="s-track" data-tab="track">追蹤</button>
+          <button data-go="s-settings" data-tab="settings">設定</button>
+        </div>
 
       </div>
     </div>
@@ -772,10 +797,20 @@ footer.demo-foot{
     b.addEventListener("click", function(){ show(i); });
     li.appendChild(b); nav.appendChild(li);
   });
+  var TAB_OF = {
+    "s-result-etf": "calc", "s-result-stock": "calc", "s-fail": "calc",
+    "s-track": "track", "s-settings": "settings"
+  };
   function show(i){
     screens.forEach(function(s, j){
       s.classList.toggle("active", i === j);
       nav.children[j].firstChild.setAttribute("aria-current", i === j ? "true" : "false");
+    });
+    var tab = TAB_OF[screens[i].id] || "";
+    var tabbar = document.querySelector(".tabbar");
+    tabbar.style.display = tab ? "" : "none"; /* onboarding 流程不顯示 tab */
+    tabbar.querySelectorAll("button").forEach(function(b){
+      b.setAttribute("aria-current", String(b.dataset.tab === tab));
     });
     if (!reduced) {
       screens[i].querySelectorAll(".printline").forEach(function(p){
@@ -786,10 +821,56 @@ footer.demo-foot{
       });
     }
   }
-  /* deep link: ?s=1..12&theme=dark ------------------------------------- */
+  function showById(id){
+    var i = screens.findIndex(function(s){ return s.id === id; });
+    if (i >= 0) show(i);
+  }
+  /* deep link: ?s=1..12&theme=dark&app=1 -------------------------------- */
   var qs = new URLSearchParams(location.search);
   var startIdx = Math.min(Math.max((parseInt(qs.get("s"), 10) || 7) - 1, 0), screens.length - 1);
   show(startIdx); /* default: 結果 ETF — the signature screen */
+
+  /* App 操作模式 ---------------------------------------------------------- */
+  var appMode = false;
+  var dmGallery = document.getElementById("dmGallery"), dmApp = document.getElementById("dmApp");
+  function setAppMode(on){
+    appMode = on;
+    document.body.classList.toggle("app-mode", on);
+    dmGallery.setAttribute("aria-pressed", String(!on));
+    dmApp.setAttribute("aria-pressed", String(on));
+    if (on) {
+      show(0); /* 從載入畫面走真實流程 */
+      setTimeout(function(){
+        if (appMode && screens[0].classList.contains("active")) showById("s-disclaimer");
+      }, reduced ? 0 : 1400);
+    }
+  }
+  dmGallery.addEventListener("click", function(){ setAppMode(false); });
+  dmApp.addEventListener("click", function(){ setAppMode(true); });
+
+  /* App 模式:按鈕導航(事件委派) */
+  document.getElementById("phone").addEventListener("click", function(e){
+    if (!appMode) return;
+    var go = e.target.closest("[data-go]");
+    if (go) { showById(go.dataset.go); return; }
+    if (e.target.closest("#startCalc")) {
+      var stock = document.getElementById("pickStock").getAttribute("aria-pressed") === "true";
+      showById(stock ? "s-result-stock" : "s-result-etf");
+    }
+  });
+
+  /* 標的選擇(兩種模式都可切) */
+  var pickEtf = document.getElementById("pickEtf"), pickStock = document.getElementById("pickStock");
+  function pick(stock){
+    pickEtf.setAttribute("aria-pressed", String(!stock));
+    pickStock.setAttribute("aria-pressed", String(stock));
+  }
+  pickEtf.addEventListener("click", function(){ pick(false); });
+  pickStock.addEventListener("click", function(){ pick(true); });
+  if (qs.get("app") === "1") {
+    setAppMode(true);
+    if (qs.get("s")) show(startIdx); /* app 模式也可深連指定畫面 */
+  }
 
   /* theme --------------------------------------------------------------- */
   var themeBtn = document.getElementById("themeToggle");
@@ -879,12 +960,16 @@ footer.demo-foot{
     advOut.textContent = "NT$ " + v.toLocaleString("en-US");
     simState.textContent = "快速估算中⋯(放開後跑完整模擬)";
     simState.classList.add("live");
+    document.getElementById("failLink").hidden = true; /* 拖曳中不顯示,放開後再判斷 */
     etfHero.innerHTML = estAge(v) + '<span class="unit">歲</span><span class="verb">退休</span>';
     updateFan(v);
   });
   advRange.addEventListener("change", function(){
     simState.textContent = "模擬結果 · 1,000 次情境";
     simState.classList.remove("live");
+    /* WCAG 3.2.2:不自動跳頁 — 低投入時就地顯示明確的導航動作 */
+    var failLink = document.getElementById("failLink");
+    failLink.hidden = !(appMode && Number(advRange.value) <= 7000);
   });
 
   /* 進階:30 秒導覽 -------------------------------------------------------- */
