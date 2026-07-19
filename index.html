@@ -416,7 +416,10 @@ footer.demo-foot{
           <div class="appbar"><span class="title">投入計畫</span><span class="spacer"></span><span class="caption">3 / 4</span></div>
           <div class="body">
             <div class="card ledger">
-              <div class="row"><span class="k">目前年齡</span><span class="v">35<small>歲</small></span></div>
+              <div class="slider-row">
+                <div class="lab"><span>目前年齡</span><output class="mono" id="ageOut">35 歲</output></div>
+                <input type="range" min="18" max="80" step="1" value="35" id="ageRange" aria-label="目前年齡">
+              </div>
               <div class="row"><span class="k">已累積資產</span><span class="v">NT$ 800,000</span></div>
             </div>
             <div class="card chart-card">
@@ -520,17 +523,17 @@ footer.demo-foot{
               <div class="pcards">
                 <div class="pcard p90">
                   <div class="p">P90 樂觀</div>
-                  <div class="age mono">54<small> 歲</small></div>
+                  <div class="age mono" data-base="54">54<small> 歲</small></div>
                   <p class="note">10% 情境更早</p>
                 </div>
                 <div class="pcard p50">
                   <div class="p">P50 中位</div>
-                  <div class="age mono">58<small> 歲</small></div>
+                  <div class="age mono" data-base="58">58<small> 歲</small></div>
                   <p class="note">一半情境在此前</p>
                 </div>
                 <div class="pcard p10">
                   <div class="p">P10 保守</div>
-                  <div class="age mono">65<small> 歲</small></div>
+                  <div class="age mono" data-base="65">65<small> 歲</small></div>
                   <p class="note">90% 情境在此前</p>
                 </div>
               </div>
@@ -905,6 +908,19 @@ footer.demo-foot{
     investOut.textContent = "NT$ " + Number(investRange.value).toLocaleString("en-US");
   });
 
+  /* 目前年齡 slider(F-01 v0.7:18–80,預設 35)----------------------------- */
+  var ageRange = document.getElementById("ageRange");
+  var ageOut = document.getElementById("ageOut");
+  var ageDelta = 0; /* 相對預設 35 的差量;結果頁達標年齡 = 基準 + 差量 */
+  ageRange.addEventListener("input", function(){
+    ageOut.textContent = ageRange.value + " 歲";
+    ageDelta = Number(ageRange.value) - 35;
+    document.querySelectorAll('#s-result-etf .pcard .age[data-base]').forEach(function(el){
+      el.innerHTML = (Number(el.getAttribute("data-base")) + ageDelta) + '<small> 歲</small>';
+    });
+    etfHero.innerHTML = heroAge(Number(advRange.value)) + '<span class="unit">歲</span><span class="verb">退休</span>';
+  });
+
   /* 結果 ETF:簡單/進階 --------------------------------------------------- */
   var mS = document.getElementById("modeSimple"), mA = document.getElementById("modeAdv");
   var simple = document.getElementById("etfSimple"), adv = document.getElementById("etfAdv");
@@ -935,6 +951,7 @@ footer.demo-foot{
   var simState = document.getElementById("simState");
   var etfHero = document.getElementById("etfHero");
   function estAge(v){ return Math.max(45, Math.round(66 - (v / 3000))); }
+  function heroAge(v){ return Math.min(99, estAge(v) + ageDelta); }
   /* §6: slider updates the fan live — the chart itself, not just the numeral */
   function fanC(y){
     return "C210 " + (92 + (y - 92) * 0.14).toFixed(1) + " 265 " + (92 + (y - 92) * 0.64).toFixed(1) + " 322 " + y.toFixed(1);
@@ -961,7 +978,7 @@ footer.demo-foot{
     simState.textContent = "快速估算中⋯(放開後跑完整模擬)";
     simState.classList.add("live");
     document.getElementById("failLink").hidden = true; /* 拖曳中不顯示,放開後再判斷 */
-    etfHero.innerHTML = estAge(v) + '<span class="unit">歲</span><span class="verb">退休</span>';
+    etfHero.innerHTML = heroAge(v) + '<span class="unit">歲</span><span class="verb">退休</span>';
     updateFan(v);
   });
   advRange.addEventListener("change", function(){
