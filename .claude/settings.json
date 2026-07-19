@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f design/DESIGN_SPEC.md ]; then python3 ops/design/scripts/audit_tokens.py --spec design/DESIGN_SPEC.md --src . --hook; fi"
+          }
+        ]
+      }
+    ]
+  }
+}
