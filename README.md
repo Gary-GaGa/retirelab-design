@@ -7,6 +7,7 @@ Live Demo:https://gary-gaga.github.io/retirelab-design/
 
 | 匯出日期 | 檔案 | 對應 PRD 版本 | 涵蓋畫面 / 備註 |
 |---|---|---|---|
+| 2026-07-20 | index.html(帳本畫面組出稿) | PRD v0.7 F-12 / §6.7 | 新增第 11 畫面「帳本」+ tabbar 第 4 tab:持有市值 hero、持股卡(均價/未實現損益)、三數字誠實對照(簡單法/XIRR/計畫假設,口徑標示)、已實現損益、年度配息(總額+最大標的)、最近交易(含手續費/證交稅)。全部數字由 engine ledger/xirr 模組計算(合成交易 9 筆、現價手動輸入,Rule 3/7);文案沿用 copy-registry ledger.* 條目;損益以 +/− 中性呈現(禁紅綠漲跌)。共 13 畫面 |
 | 2026-07-20 | index.html + engine.js(真引擎接線) | PRD v0.7 | demo 數字全面改為 `@retirelab/engine` 真實輸出:`engine.js`(9.5KB IIFE,主 repo `npm run bundle:demo-engine` 產生,內含 fixtures 合成資料)驅動 ETF 結果(MC 1,000 次、seed 42、實質報酬=名目÷通膨 2%)、個股封閉解、無法達標頁(門檻:60 歲前退休);示範情境改為目標 1,500 萬/缺口 50,000(原 375 萬在合成報酬下全情境過早達標,故事撐不起來);投入/年齡/進階 slider 雙向同步且驅動真模擬;結果頁 caption 標示合成資料+通膨假設;追蹤頁進度改 1,400,000(修正報酬=0 的不自洽);無引擎時 fallback 舊估算式。每年調升 slider 仍為純視覺(engine 未支援投入遞增)。navtest ALL-PASS、audit_tokens 歸零 |
 | 2026-07-20 | index.html(就地 patch) | PRD v0.7 F-01 | 「投入」畫面之目前年齡由靜態文字改為 slider(18–80,預設 35);結果 ETF 頁 hero 與 P90/P50/P10 三卡年齡依年齡差量位移(demo 假邏輯,非引擎輸出)。`audit_tokens.py` 歸零 |
 | 2026-07-19 | index.html | v0.2 規格 + DESIGN_SPEC(FROZEN) | 12 畫面依 `design/DESIGN_SPEC.md`「存摺分岔線」重新實作:存摺帳頁語彙(等寬印字數字、細帳簿線、冷綠灰紙色 #F1F4F0)、結果頁餘額線於「今天」分岔(ETF=P90/P50/P10 單色綠扇形;個股=單線+確定性試算戳章,無機率語句)、light/dark tokens、print 動效 + prefers-reduced-motion、`?s=N&theme=dark&mode=adv` deep link;瀏覽/App 雙模式(`?app=1` 或右上切換,App 模式可實際操作完整流程:onboarding→結果、底部 tab、低投入→調整建議)。`audit_tokens.py` 歸零 + design-critic 驗收;`ops/design/tests/navtest.html` 為導航回歸測試(headless Chrome dump-dom 執行) |

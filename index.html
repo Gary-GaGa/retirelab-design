@@ -300,7 +300,7 @@ footer.demo-foot{
     </svg>
     <div>
       <h1>幾歲退休 — 設計稿</h1>
-      <div class="sub">v0.2 · 12 畫面 · DESIGN_SPEC「存摺分岔線」</div>
+      <div class="sub">v0.2 · 13 畫面 · DESIGN_SPEC「存摺分岔線」</div>
     </div>
     <div class="spacer"></div>
     <div class="seg" role="group" aria-label="Demo 模式">
@@ -676,7 +676,41 @@ footer.demo-foot{
           </div>
         </section>
 
-        <!-- 11 設定 ======================================================= -->
+        <!-- 11 帳本 ======================================================= -->
+        <section class="screen" id="s-ledger" data-name="帳本">
+          <div class="appbar">
+            <span class="title">帳本</span>
+            <span class="spacer"></span>
+            <span class="caption">更新於 2026/07/20</span>
+          </div>
+          <div class="body">
+            <div class="hero">
+              <p class="lead">持有市值</p>
+              <div class="figure mono" style="font-size:44px" id="lgValue">NT$ —</div>
+              <p class="caption">現價為手動輸入,非即時行情;市值與未實現損益依你輸入之價格計算。</p>
+            </div>
+            <div class="section-label">未實現損益(平均成本法,含買進手續費)</div>
+            <div class="card ledger" id="lgHoldings"></div>
+            <div class="section-label">三數字誠實對照</div>
+            <div class="card ledger">
+              <div class="row"><span class="k">總報酬(簡單法)</span><span class="v mono" id="lgNaive">—</span></div>
+              <div class="row"><span class="k">年化報酬(XIRR)</span><span class="v mono" id="lgXirr">—</span></div>
+              <div class="row"><span class="k">計畫假設(年化,實質)</span><span class="v mono" id="lgPlan">—</span></div>
+            </div>
+            <p class="caption">總報酬(簡單法)/ 年化報酬(XIRR)/ 計畫假設(年化)——口徑不同,不可直接互比。</p>
+            <div class="section-label">已實現與配息</div>
+            <div class="card ledger">
+              <div class="row"><span class="k">已實現損益(不含配息)</span><span class="v mono" id="lgRealized">—</span></div>
+              <div class="row"><span class="k">2026 年總配息(實領金額)</span><span class="v mono" id="lgDivTotal">—</span></div>
+              <div class="row total"><span class="k">配息金額最大標的</span><span class="v mono" id="lgDivTop">—</span></div>
+            </div>
+            <div class="section-label">最近交易(含手續費與證交稅)</div>
+            <div class="card ledger" id="lgTxns"></div>
+            <p class="caption">手動買賣/配息紀錄 → 自動推導持股與損益;賣超會被拒絕。示範資料為合成情境。</p>
+          </div>
+        </section>
+
+        <!-- 12 設定 ======================================================= -->
         <section class="screen" id="s-settings" data-name="設定">
           <div class="appbar"><span class="title">設定</span></div>
           <div class="body">
@@ -719,7 +753,7 @@ footer.demo-foot{
           </div>
         </section>
 
-        <!-- 12 狀態變體 ==================================================== -->
+        <!-- 13 狀態變體 ==================================================== -->
         <section class="screen" id="s-variants" data-name="狀態變體">
           <div class="appbar"><span class="title">狀態變體</span></div>
           <div class="body variant-grid">
@@ -773,6 +807,7 @@ footer.demo-foot{
         <div class="tabbar" role="tablist" aria-label="App 導覽">
           <button data-go="s-result-etf" data-tab="calc" aria-current="true">試算</button>
           <button data-go="s-track" data-tab="track">追蹤</button>
+          <button data-go="s-ledger" data-tab="ledger">帳本</button>
           <button data-go="s-settings" data-tab="settings">設定</button>
         </div>
 
@@ -828,7 +863,7 @@ footer.demo-foot{
   });
   var TAB_OF = {
     "s-result-etf": "calc", "s-result-stock": "calc", "s-fail": "calc",
-    "s-track": "track", "s-settings": "settings"
+    "s-track": "track", "s-ledger": "ledger", "s-settings": "settings"
   };
   function show(i){
     screens.forEach(function(s, j){
@@ -1068,6 +1103,55 @@ footer.demo-foot{
     failLink.hidden = !(appMode && isFail());
   });
   renderResults(); /* 初始渲染:預設值即為真引擎輸出 */
+
+  /* 帳本(F-12/§6.7:真引擎 ledger/xirr;示範合成交易,現價手動輸入)---------- */
+  var LEDGER_TXNS = [
+    { date: "2025-01-15", symbol: "0050", assetClass: "etf",   type: "buy",  shares: 2000, price: 100 },
+    { date: "2025-04-15", symbol: "0050", assetClass: "etf",   type: "buy",  shares: 2000, price: 108 },
+    { date: "2025-07-15", symbol: "0056", assetClass: "etf",   type: "buy",  shares: 5000, price: 34 },
+    { date: "2025-08-01", symbol: "0056", assetClass: "etf",   type: "dividend", amount: 5350 },
+    { date: "2025-10-15", symbol: "0050", assetClass: "etf",   type: "buy",  shares: 2000, price: 115 },
+    { date: "2026-01-15", symbol: "2330", assetClass: "stock", type: "buy",  shares: 1000, price: 620 },
+    { date: "2026-03-10", symbol: "0050", assetClass: "etf",   type: "sell", shares: 1000, price: 128 },
+    { date: "2026-03-20", symbol: "0050", assetClass: "etf",   type: "dividend", amount: 9000 },
+    { date: "2026-07-01", symbol: "0056", assetClass: "etf",   type: "dividend", amount: 5600 }
+  ];
+  var LEDGER_PRICES = { "0050": 132, "0056": 35.2, "2330": 645 }; /* 手動輸入現價(Rule 7:Q2 前無行情源)*/
+  function fmtNT(n){ return "NT$ " + Math.round(n).toLocaleString("en-US"); }
+  function fmtSigned(n){ return (n >= 0 ? "+" : "−") + "NT$ " + Math.abs(Math.round(n)).toLocaleString("en-US"); }
+  function fmtPct(x){ return (x >= 0 ? "+" : "−") + Math.abs(x * 100).toFixed(1) + "%"; }
+  function renderLedger(){
+    if (!E || !document.getElementById("lgValue")) return;
+    var cfg = { brokerFeeDiscount: 0.6 };
+    var snap = E.buildLedgerSnapshot(LEDGER_TXNS, cfg);
+    var value = E.portfolioValue(snap.holdings, LEDGER_PRICES);
+    var un = E.unrealizedPnL(snap.holdings, LEDGER_PRICES);
+    var div = E.dividendSummary(LEDGER_TXNS, 2026);
+    document.getElementById("lgValue").textContent = fmtNT(value);
+    var hold = "";
+    snap.holdings.forEach(function(h){
+      if (h.shares <= 0) return;
+      hold += '<div class="row"><span class="k">' + h.symbol + " × " + h.shares.toLocaleString("en-US") + " 股 · 均價 " + h.avgCost.toFixed(1) + '</span><span class="v mono">' + fmtSigned(un.bySymbol.get(h.symbol)) + "</span></div>";
+    });
+    hold += '<div class="row total"><span class="k">未實現損益合計</span><span class="v mono">' + fmtSigned(un.total) + "</span></div>";
+    document.getElementById("lgHoldings").innerHTML = hold;
+    var flows = LEDGER_TXNS.map(function(t){ return { date: t.date, amount: E.transactionCashFlow(t, cfg) }; });
+    flows.push({ date: "2026-07-20", amount: value });
+    var rate = E.xirr(flows);
+    document.getElementById("lgNaive").textContent = fmtPct(E.naiveTotalReturn(LEDGER_TXNS, cfg, value));
+    document.getElementById("lgXirr").textContent = rate == null ? "—" : fmtPct(rate) + "/年";
+    document.getElementById("lgPlan").textContent = "+" + ((Math.pow(1 + geoMonthly, 12) - 1) * 100).toFixed(1) + "%/年";
+    document.getElementById("lgRealized").textContent = fmtSigned(snap.realized.total);
+    document.getElementById("lgDivTotal").textContent = fmtNT(div.total);
+    document.getElementById("lgDivTop").textContent = div.top ? div.top.symbol + " · " + fmtNT(div.top.amount) : "—";
+    var tx = "";
+    LEDGER_TXNS.slice(-5).reverse().forEach(function(t){
+      var label = t.date + " " + t.symbol + " " + (t.type === "buy" ? "買進 " + t.shares.toLocaleString("en-US") + " 股" : t.type === "sell" ? "賣出 " + t.shares.toLocaleString("en-US") + " 股" : "配息");
+      tx += '<div class="row"><span class="k">' + label + '</span><span class="v mono">' + fmtSigned(E.transactionCashFlow(t, cfg)) + "</span></div>";
+    });
+    document.getElementById("lgTxns").innerHTML = tx;
+  }
+  renderLedger();
 
   /* 進階:30 秒導覽 -------------------------------------------------------- */
   var guide = document.getElementById("fanGuide");
