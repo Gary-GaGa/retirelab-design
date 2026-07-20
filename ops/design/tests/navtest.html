@@ -94,6 +94,15 @@ document.getElementById("f").addEventListener("load", function(){
     var heroUp = doc.getElementById("etfHero").textContent;
     results.push((heroUp !== hero0 ? "PASS" : "FAIL") + " 調升滑桿→引擎重算(F-02)");
     rr.value = 0; rr.dispatchEvent(new Event("input", {bubbles: true}));
+    /* 漸進揭露:摺疊預設收合、摺疊內控制仍連動 */
+    var folds = doc.querySelectorAll("details.fold");
+    var allClosed = folds.length >= 5 && Array.prototype.every.call(folds, function(f){ return !f.open; });
+    results.push((allClosed ? "PASS" : "FAIL") + " 摺疊預設收合(" + folds.length + " 個)");
+    var lb = doc.getElementById("gapLaobao");
+    lb.value = 28000; lb.dispatchEvent(new Event("input", {bubbles: true}));
+    var lbOk = doc.getElementById("goalTarget").textContent.indexOf("15,000,000") < 0;
+    lb.value = 18000; lb.dispatchEvent(new Event("input", {bubbles: true}));
+    results.push((lbOk ? "PASS" : "FAIL") + " 摺疊內勞保滑桿→目標連動");
     var pass = results.filter(function(r){ return r.indexOf("FAIL") === 0; }).length === 0;
     document.getElementById("out").textContent =
       "NAVTEST " + (pass ? "ALL-PASS" : "HAS-FAIL") + "\n" + results.join("\n");

@@ -247,6 +247,14 @@ input[type="range"]{width:100%;accent-color:var(--a1);height:28px}
 .guide .g-actions button{color:var(--a1);font-weight:700;font-size:13px;min-height:32px}
 .guide .g-step{font-weight:600}
 
+/* fold(漸進揭露:預設收合,進階內容不刪只收)--------------------------------- */
+details.fold{border:1px solid var(--rule);border-radius:12px;background:var(--surf);padding:0 14px;margin-top:8px}
+details.fold>summary{cursor:pointer;list-style:none;padding:12px 0;font-size:13px;font-weight:600;color:var(--ink-soft)}
+details.fold>summary::before{content:"▸ ";color:var(--a1)}
+details.fold[open]>summary::before{content:"▾ "}
+details.fold>summary::-webkit-details-marker{display:none}
+details.fold>.fold-body{padding-bottom:12px}
+
 /* holding rows(帳本配置列,可點入明細)-------------------------------------- */
 button.holding-row{cursor:pointer;background:none;border:0;font:inherit;width:100%;text-align:left}
 .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:7px;vertical-align:-1px}
@@ -381,31 +389,37 @@ footer.demo-foot{
             <p style="font-size:15px">退休金有三層:勞保、勞退、自己準備。先抓前兩層,剩下的缺口才是這個 App 要幫你算的。</p>
             <div class="card ledger">
               <div class="slider-row">
-                <div class="lab"><span>退休後月支出(估)</span><output class="mono" id="gapExpOut">NT$ 77,500</output></div>
+                <div class="lab"><span>退休後每月想花多少?</span><output class="mono" id="gapExpOut">NT$ 77,500</output></div>
                 <input type="range" min="30000" max="150000" step="2500" value="77500" id="gapExpense" aria-label="退休後月支出">
               </div>
-              <div class="slider-row">
-                <div class="lab"><span>勞保老年給付(估)</span><output class="mono" id="gapLbOut">NT$ 18,000</output></div>
-                <input type="range" min="0" max="45000" step="500" value="18000" id="gapLaobao" aria-label="勞保老年給付">
-              </div>
-              <div class="slider-row">
-                <div class="lab"><span>勞退新制月退(估)</span><output class="mono" id="gapLtOut">NT$ 9,500</output></div>
-                <input type="range" min="0" max="30000" step="500" value="9500" id="gapLaotui" aria-label="勞退新制月退">
-              </div>
-              <div class="row"><span class="k">不確定?</span><a class="link" href="https://www.bli.gov.tw/" target="_blank" rel="noopener">勞動部勞保局試算 ↗</a></div>
               <div class="row total"><span class="k">自備缺口</span><span class="v" id="gapOut">NT$ 50,000<small>/月</small></span></div>
             </div>
-            <div>
-              <div class="section-label">提領率(SWR)</div>
-              <p class="caption" style="margin:4px 0 8px">退休後每年從資產提領的比例。常見 3–5%,預設 4%。</p>
-              <div class="chips" id="swrChips" role="group" aria-label="提領率">
-                <button aria-pressed="false">3.0%</button>
-                <button aria-pressed="false">3.5%</button>
-                <button aria-pressed="true">4.0%</button>
-                <button aria-pressed="false">4.5%</button>
-                <button aria-pressed="false">5.0%</button>
+            <p class="caption">用現在的生活水準想像就好,之後隨時能改。政府給付(勞保+勞退,可在下方調整)已先扣除 — 剩下的才是要自己準備的。</p>
+            <details class="fold">
+              <summary>政府給付與提領率(用預設就好,也可以自己調)</summary>
+              <div class="fold-body">
+                <div class="card ledger" style="margin-bottom:8px">
+                  <div class="slider-row">
+                    <div class="lab"><span>勞保老年給付(估)</span><output class="mono" id="gapLbOut">NT$ 18,000</output></div>
+                    <input type="range" min="0" max="45000" step="500" value="18000" id="gapLaobao" aria-label="勞保老年給付">
+                  </div>
+                  <div class="slider-row">
+                    <div class="lab"><span>勞退新制月退(估)</span><output class="mono" id="gapLtOut">NT$ 9,500</output></div>
+                    <input type="range" min="0" max="30000" step="500" value="9500" id="gapLaotui" aria-label="勞退新制月退">
+                  </div>
+                  <div class="row"><span class="k">不確定?</span><a class="link" href="https://www.bli.gov.tw/" target="_blank" rel="noopener">勞動部勞保局試算 ↗</a></div>
+                </div>
+                <div class="section-label">提領率(SWR)</div>
+                <p class="caption" style="margin:4px 0 8px">退休後每年從資產提領的比例。常見 3–5%,預設 4%。</p>
+                <div class="chips" id="swrChips" role="group" aria-label="提領率">
+                  <button aria-pressed="false">3.0%</button>
+                  <button aria-pressed="false">3.5%</button>
+                  <button aria-pressed="true">4.0%</button>
+                  <button aria-pressed="false">4.5%</button>
+                  <button aria-pressed="false">5.0%</button>
+                </div>
               </div>
-            </div>
+            </details>
             <div class="btn-row"><button class="btn primary" data-go="s-goal">下一步:設定目標</button></div>
           </div>
         </section>
@@ -440,24 +454,33 @@ footer.demo-foot{
                 <div class="lab"><span>目前年齡</span><output class="mono" id="ageOut">35 歲</output></div>
                 <input type="range" min="18" max="80" step="1" value="35" id="ageRange" aria-label="目前年齡">
               </div>
-              <div class="row"><span class="k">已累積資產</span><span class="v" id="assetVal">NT$ 800,000</span></div>
             </div>
-            <div class="seg" role="group" aria-label="已累積資產來源">
-              <button id="assetManual" aria-pressed="true">手動輸入</button>
-              <button id="assetLedger" aria-pressed="false">帳本市值</button>
-            </div>
-            <p class="caption" id="assetNote">預設為示範值;切換「帳本市值」後,以帳本持股 × 手動現價計入試算起點。</p>
             <div class="card chart-card">
               <div class="slider-row">
                 <div class="lab"><span>每月投入</span><output class="mono" id="investOut">NT$ 15,000</output></div>
                 <input type="range" min="5000" max="50000" step="1000" value="15000" id="investRange" aria-label="每月投入金額">
               </div>
-              <div class="slider-row">
-                <div class="lab"><span>每年調升</span><output class="mono" id="raiseOut">0%</output></div>
-                <input type="range" min="0" max="10" step="1" value="0" id="raiseRange" aria-label="每年調升比例">
-              </div>
             </div>
             <p class="caption">投入金額之後可以隨薪資調整;先抓一個做得到的數字。</p>
+            <details class="fold">
+              <summary>更多選項(每年調升、已累積資產)</summary>
+              <div class="fold-body">
+                <div class="card chart-card" style="margin-bottom:8px">
+                  <div class="slider-row">
+                    <div class="lab"><span>每年調升</span><output class="mono" id="raiseOut">0%</output></div>
+                    <input type="range" min="0" max="10" step="1" value="0" id="raiseRange" aria-label="每年調升比例">
+                  </div>
+                </div>
+                <div class="card ledger" style="margin-bottom:8px">
+                  <div class="row"><span class="k">已累積資產</span><span class="v" id="assetVal">NT$ 800,000</span></div>
+                </div>
+                <div class="seg" role="group" aria-label="已累積資產來源">
+                  <button id="assetManual" aria-pressed="true">手動輸入</button>
+                  <button id="assetLedger" aria-pressed="false">帳本市值</button>
+                </div>
+                <p class="caption" id="assetNote">預設為示範值;切換「帳本市值」後,以帳本持股 × 手動現價計入試算起點。</p>
+              </div>
+            </details>
             <div class="btn-row"><button class="btn primary" data-go="s-target">下一步:選擇標的</button></div>
           </div>
         </section>
@@ -562,6 +585,7 @@ footer.demo-foot{
                   <p class="note">90% 情境在此前</p>
                 </div>
               </div>
+              <p class="caption">三張卡是同一份模擬的樂觀/中位/保守情境,不是三種商品。</p>
             </div>
 
             <!-- 進階模式 -->
@@ -714,21 +738,28 @@ footer.demo-foot{
               <svg viewBox="0 0 340 40" id="lgAllocBar" role="img" aria-label="持股市值占比橫條圖:單色綠明度階,列表為圖例與數值"></svg>
             </div>
             <div class="card ledger" id="lgHoldings"></div>
-            <div class="section-label">三數字誠實對照</div>
-            <div class="card ledger">
-              <div class="row"><span class="k">總報酬(簡單法)</span><span class="v mono" id="lgNaive">—</span></div>
-              <div class="row"><span class="k">年化報酬(XIRR)</span><span class="v mono" id="lgXirr">—</span></div>
-              <div class="row"><span class="k">計畫假設(年化,實質)</span><span class="v mono" id="lgPlan">—</span></div>
-            </div>
-            <p class="caption">總報酬(簡單法)/ 年化報酬(XIRR)/ 計畫假設(年化)——口徑不同,不可直接互比。</p>
-            <div class="section-label">已實現與配息</div>
-            <div class="card ledger">
-              <div class="row"><span class="k">已實現損益(不含配息)</span><span class="v mono" id="lgRealized">—</span></div>
-              <div class="row"><span class="k">2026 年總配息(實領金額)</span><span class="v mono" id="lgDivTotal">—</span></div>
-              <div class="row total"><span class="k">配息金額最大標的</span><span class="v mono" id="lgDivTop">—</span></div>
-            </div>
-            <div class="section-label">新增持股(手動輸入)</div>
-            <div class="card ledger">
+            <details class="fold">
+              <summary>更多:報酬對照與配息</summary>
+              <div class="fold-body">
+                <div class="section-label">三數字誠實對照</div>
+                <div class="card ledger">
+                  <div class="row"><span class="k">總報酬(簡單法)</span><span class="v mono" id="lgNaive">—</span></div>
+                  <div class="row"><span class="k">年化報酬(XIRR)</span><span class="v mono" id="lgXirr">—</span></div>
+                  <div class="row"><span class="k">計畫假設(年化,實質)</span><span class="v mono" id="lgPlan">—</span></div>
+                </div>
+                <p class="caption">XIRR=把投入時間也算進去的年化報酬。三數字口徑不同(總報酬/年化),不可直接互比。</p>
+                <div class="section-label">已實現與配息</div>
+                <div class="card ledger">
+                  <div class="row"><span class="k">已實現損益(不含配息)</span><span class="v mono" id="lgRealized">—</span></div>
+                  <div class="row"><span class="k">2026 年總配息(實領金額)</span><span class="v mono" id="lgDivTotal">—</span></div>
+                  <div class="row total"><span class="k">配息金額最大標的</span><span class="v mono" id="lgDivTop">—</span></div>
+                </div>
+              </div>
+            </details>
+            <details class="fold">
+              <summary>新增持股(手動輸入)</summary>
+              <div class="fold-body">
+                <div class="card ledger">
               <div class="row" style="flex-wrap:wrap;gap:8px;padding:10px 0">
                 <span class="k" style="width:100%">標的</span>
                 <div class="chips" id="holdSymChips" role="group" aria-label="標的"></div>
@@ -738,11 +769,17 @@ footer.demo-foot{
               <div class="row field-row"><span class="k">每股買進均價</span><input type="number" id="holdCost" min="0.01" step="0.1" value="120" aria-label="每股買進均價"></div>
               <div class="row field-row"><span class="k">目前現價(手動)</span><input type="number" id="holdPrice" min="0.01" step="0.1" value="132" aria-label="目前現價"></div>
               <div class="btn-row" style="padding:8px 0 4px"><button class="btn primary" id="holdAdd">加入帳本</button></div>
-            </div>
-            <p class="caption">現價為手動輸入,非即時行情(Q2 前無行情源);以買進均價入帳,手續費由引擎另計(與明細頁加碼同口徑),平均成本法併入持股,並可作為試算起點(投入頁切換)。單筆交易明細移至各持股頁。</p>
-            <div class="section-label">配息自動生成(示意,F-17)</div>
-            <div class="card ledger" id="lgAutoDiv"></div>
-            <p class="caption">依持股 × 除息事件自動代入現金股利,可編輯後入帳;正式功能依賴 Q2 資料授權之公司行動事件庫,本區為合成事件示意。</p>
+                </div>
+                <p class="caption">現價為手動輸入,非即時行情(Q2 前無行情源);以買進均價入帳,手續費由引擎另計(與明細頁加碼同口徑),平均成本法併入持股,並可作為試算起點(投入頁切換)。單筆交易明細移至各持股頁。</p>
+              </div>
+            </details>
+            <details class="fold">
+              <summary>配息自動生成(示意,F-17)</summary>
+              <div class="fold-body">
+                <div class="card ledger" id="lgAutoDiv"></div>
+                <p class="caption">依持股 × 除息事件自動代入現金股利,可編輯後入帳;正式功能依賴 Q2 資料授權之公司行動事件庫,本區為合成事件示意。</p>
+              </div>
+            </details>
           </div>
         </section>
 
@@ -950,6 +987,7 @@ footer.demo-foot{
               <div class="row"><span class="k">已實現損益(不含配息)</span><span class="v mono" id="hdReal">—</span></div>
               <div class="row total"><span class="k">2026 年配息(實領)</span><span class="v mono" id="hdDiv">—</span></div>
             </div>
+            <p class="caption">均價=多次買進攤平後的每股成本(平均成本法,含買進手續費)。</p>
             <div class="section-label">調整</div>
             <div class="card ledger">
               <div class="row field-row"><span class="k">目前現價(手動)</span><input type="number" id="hdPrice" min="0.01" step="0.1" aria-label="目前現價"></div>
