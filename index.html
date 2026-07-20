@@ -1723,6 +1723,7 @@ footer.demo-foot{
   function renderAll(){ renderGap(); renderResults(); renderCompare(); renderDecum(); renderAssets(); }
   renderAll();
   renderAutoDiv();
+  if (E && !currentHolding) { currentHolding = "0050"; renderHolding(); } /* gallery 直開明細頁時的預設內容 */
 })();
 </script>
 </body>
