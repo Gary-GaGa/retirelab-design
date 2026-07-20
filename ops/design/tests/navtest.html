@@ -45,6 +45,21 @@ document.getElementById("f").addEventListener("load", function(){
     results.push((fl && !fl.hidden ? "PASS" : "FAIL") + " 低投入→顯示「查看調整建議」連結");
     fl.click();                                assertScreen(doc, "s-fail", "點連結→無法達標");
     click(doc, '#s-fail [data-go="s-invest"]'); assertScreen(doc, "s-invest", "無法達標→調整計畫");
+    /* v0.8 新畫面與動態接線 */
+    click(doc, '.tabbar [data-tab="ledger"]');  assertScreen(doc, "s-ledger", "tab→帳本");
+    var adOk = doc.getElementById("lgAutoDiv") && doc.getElementById("lgAutoDiv").textContent.indexOf("除息") >= 0;
+    results.push((adOk ? "PASS" : "FAIL") + " 配息自動生成示意已渲染");
+    click(doc, '.tabbar [data-tab="calc"]');    assertScreen(doc, "s-result-etf", "tab→試算");
+    click(doc, '#s-result-etf [data-go="s-method"]'); assertScreen(doc, "s-method", "結果→方法揭露");
+    var ge = doc.getElementById("gapExpense");
+    ge.value = 100000; ge.dispatchEvent(new Event("input", {bubbles: true}));
+    var tOk = doc.getElementById("goalTarget").textContent.indexOf("21,750,000") >= 0;
+    results.push((tOk ? "PASS" : "FAIL") + " 缺口輸入→目標動態重算(gap.ts)");
+    ge.value = 77500; ge.dispatchEvent(new Event("input", {bubbles: true}));
+    var cmpOk = doc.getElementById("cmpTable") && doc.getElementById("cmpTable").textContent.indexOf("P50") >= 0;
+    results.push((cmpOk ? "PASS" : "FAIL") + " 標的比較引擎數字已渲染");
+    var dcOk = doc.getElementById("decumHero") && doc.getElementById("decumHero").textContent.indexOf("—") < 0;
+    results.push((dcOk ? "PASS" : "FAIL") + " 提領期引擎數字已渲染");
     var pass = results.filter(function(r){ return r.indexOf("FAIL") === 0; }).length === 0;
     document.getElementById("out").textContent =
       "NAVTEST " + (pass ? "ALL-PASS" : "HAS-FAIL") + "\n" + results.join("\n");

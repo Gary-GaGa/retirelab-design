@@ -300,7 +300,7 @@ footer.demo-foot{
     </svg>
     <div>
       <h1>幾歲退休 — 設計稿</h1>
-      <div class="sub">v0.2 · 13 畫面 · DESIGN_SPEC「存摺分岔線」</div>
+      <div class="sub">v0.2 · 16 畫面 · DESIGN_SPEC「存摺分岔線」</div>
     </div>
     <div class="spacer"></div>
     <div class="seg" role="group" aria-label="Demo 模式">
@@ -370,10 +370,20 @@ footer.demo-foot{
             </div>
             <p style="font-size:15px">退休金有三層:勞保、勞退、自己準備。先抓前兩層,剩下的缺口才是這個 App 要幫你算的。</p>
             <div class="card ledger">
-              <div class="row"><span class="k">勞保老年給付(估)</span><span class="v">NT$ 18,000<small>/月</small></span></div>
-              <div class="row"><span class="k">勞退新制月退(估)</span><span class="v">NT$ 9,500<small>/月</small></span></div>
+              <div class="slider-row">
+                <div class="lab"><span>退休後月支出(估)</span><output class="mono" id="gapExpOut">NT$ 77,500</output></div>
+                <input type="range" min="30000" max="150000" step="2500" value="77500" id="gapExpense" aria-label="退休後月支出">
+              </div>
+              <div class="slider-row">
+                <div class="lab"><span>勞保老年給付(估)</span><output class="mono" id="gapLbOut">NT$ 18,000</output></div>
+                <input type="range" min="0" max="45000" step="500" value="18000" id="gapLaobao" aria-label="勞保老年給付">
+              </div>
+              <div class="slider-row">
+                <div class="lab"><span>勞退新制月退(估)</span><output class="mono" id="gapLtOut">NT$ 9,500</output></div>
+                <input type="range" min="0" max="30000" step="500" value="9500" id="gapLaotui" aria-label="勞退新制月退">
+              </div>
               <div class="row"><span class="k">不確定?</span><a class="link" href="https://www.bli.gov.tw/" target="_blank" rel="noopener">勞動部勞保局試算 ↗</a></div>
-              <div class="row total"><span class="k">自備缺口</span><span class="v">NT$ 50,000<small>/月</small></span></div>
+              <div class="row total"><span class="k">自備缺口</span><span class="v" id="gapOut">NT$ 50,000<small>/月</small></span></div>
             </div>
             <div>
               <div class="section-label">提領率(SWR)</div>
@@ -396,15 +406,15 @@ footer.demo-foot{
           <div class="body">
             <div class="hero">
               <p class="lead">缺口換算後,你需要準備</p>
-              <div class="figure mono">NT$ 1,500<span class="unit">萬</span></div>
-              <p class="caption">= 每月缺口 50,000 元 ÷ 提領率 4% × 12 個月</p>
+              <div class="figure mono" id="goalHero">NT$ 1,500<span class="unit">萬</span></div>
+              <p class="caption" id="goalFormula">= 每月缺口 50,000 元 ÷ 提領率 4% × 12 個月</p>
             </div>
             <div class="card ledger">
-              <div class="row"><span class="k">退休後月支出(估)</span><span class="v">NT$ 77,500</span></div>
-              <div class="row"><span class="k">勞保 + 勞退 覆蓋</span><span class="v">NT$ 27,500</span></div>
-              <div class="row"><span class="k">自備缺口</span><span class="v">NT$ 50,000<small>/月</small></span></div>
-              <div class="row"><span class="k">提領率</span><span class="v">4.0%</span></div>
-              <div class="row total"><span class="k">目標資產</span><span class="v">NT$ 15,000,000</span></div>
+              <div class="row"><span class="k">退休後月支出(估)</span><span class="v" id="goalExp">NT$ 77,500</span></div>
+              <div class="row"><span class="k">勞保 + 勞退 覆蓋</span><span class="v" id="goalPension">NT$ 27,500</span></div>
+              <div class="row"><span class="k">自備缺口</span><span class="v" id="goalGap">NT$ 50,000<small>/月</small></span></div>
+              <div class="row"><span class="k">提領率</span><span class="v" id="goalSwr">4.0%</span></div>
+              <div class="row total"><span class="k">目標資產</span><span class="v" id="goalTarget">NT$ 15,000,000</span></div>
             </div>
             <p class="caption">月支出可依你目前的生活水準調整;之後隨時能在「設定」修改。</p>
             <div class="btn-row"><button class="btn primary" data-go="s-invest">下一步:投入計畫</button></div>
@@ -558,7 +568,7 @@ footer.demo-foot{
               </div>
             </div>
 
-            <p class="caption">資料來源:合成示範資料(23 年月報酬樣本,Q2 前非真實行情)· 以實質報酬試算(示範通膨假設 2%/年)· 樣本偏向權值股集中 · P10–P90 為歷史區間,非未來機率保證。</p>
+            <p class="caption">資料來源:合成示範資料 · 實質報酬試算(通膨 2%/年)· P10–P90 為歷史區間,非未來機率保證。 <button class="link" data-go="s-method" style="font-size:inherit">方法與資料來源 →</button></p>
           </div>
         </section>
 
@@ -624,7 +634,7 @@ footer.demo-foot{
             <div class="card chart-card">
               <svg viewBox="0 0 340 120" role="img" aria-label="資產線區間未達目標線">
                 <path d="M12 26 H328" stroke="var(--warn)" stroke-width="1.5" stroke-dasharray="5 4"/>
-                <text x="14" y="20" font-family="var(--sans)" font-size="10" fill="var(--ink-soft)">目標 NT$ 1,500 萬</text>
+                <text x="14" y="20" font-family="var(--sans)" font-size="10" fill="var(--ink-soft)" id="failTargetLabel">目標 NT$ 1,500 萬</text>
                 <path d="M150 30 V112" stroke="var(--rule)" stroke-width="1" stroke-dasharray="3 4"/>
                 <path d="M150 86 C210 80 265 66 322 50 L322 100 C265 92 210 88 150 86 Z" fill="var(--band)"/>
                 <path d="M150 86 C210 78 265 68 322 58" fill="none" stroke="var(--a1)" stroke-width="2.5"/>
@@ -707,6 +717,9 @@ footer.demo-foot{
             <div class="section-label">最近交易(含手續費與證交稅)</div>
             <div class="card ledger" id="lgTxns"></div>
             <p class="caption">手動買賣/配息紀錄 → 自動推導持股與損益;賣超會被拒絕。示範資料為合成情境。</p>
+            <div class="section-label">配息自動生成(示意,F-17)</div>
+            <div class="card ledger" id="lgAutoDiv"></div>
+            <p class="caption">依持股 × 除息事件自動代入現金股利,可編輯後入帳;正式功能依賴 Q2 資料授權之公司行動事件庫,本區為合成事件示意。</p>
           </div>
         </section>
 
@@ -736,9 +749,9 @@ footer.demo-foot{
 
             <div class="section-label" style="margin-top:8px">試算參數</div>
             <div class="card ledger">
-              <div class="row"><span class="k">提領率(SWR)</span><span class="v">4.0%</span></div>
-              <div class="row"><span class="k">退休後月支出</span><span class="v">NT$ 40,000</span></div>
-              <div class="row"><span class="k">勞保/勞退覆蓋</span><span class="v">NT$ 27,500<small>/月</small></span></div>
+              <div class="row"><span class="k">提領率(SWR)</span><span class="v" id="setSwr">4.0%</span></div>
+              <div class="row"><span class="k">退休後月支出</span><span class="v" id="setExp">NT$ 77,500</span></div>
+              <div class="row"><span class="k">勞保/勞退覆蓋</span><span class="v" id="setPension">NT$ 27,500<small>/月</small></span></div>
             </div>
 
             <div class="section-label" style="margin-top:8px">外觀</div>
@@ -804,6 +817,93 @@ footer.demo-foot{
           </div>
         </section>
 
+        <!-- 14 方法揭露 ==================================================== -->
+        <section class="screen" id="s-method" data-name="方法揭露">
+          <div class="appbar"><span class="title">方法與資料來源</span></div>
+          <div class="body">
+            <div class="section-label">資料來源</div>
+            <div class="card ledger">
+              <div class="row"><span class="k">樣本</span><span class="v">23 年台股月報酬</span></div>
+              <div class="row"><span class="k">資料版本</span><span class="v mono">fixtures-2026-07</span></div>
+              <div class="row total"><span class="k">性質</span><span class="v">合成示範資料(Q2 前非真實行情)</span></div>
+            </div>
+            <div class="section-label">模擬方法</div>
+            <p style="font-size:14px">模擬重抽樣自台股同一條歷史路徑;樣本約 23 年、市值集中於少數權值股,涵蓋之市場情境有限。P10–P90 為歷史條件下的分佈,非未來機率之保證。</p>
+            <div class="card ledger">
+              <div class="row"><span class="k">方法</span><span class="v">Block Bootstrap</span></div>
+              <div class="row"><span class="k">情境數</span><span class="v mono">1,000 次(demo)</span></div>
+              <div class="row"><span class="k">區塊長度</span><span class="v mono">12 個月</span></div>
+              <div class="row"><span class="k">通膨假設</span><span class="v mono">2%/年(示範)</span></div>
+            </div>
+            <div class="section-label">稅費假設</div>
+            <p style="font-size:14px">稅費為簡化模型,非稅務建議;假設清單如下。</p>
+            <div class="card ledger">
+              <div class="row"><span class="k">買進手續費</span><span class="v mono">0.1425% × 折數</span></div>
+              <div class="row"><span class="k">股利稅</span><span class="v">合併計稅 vs 28% 分離,取低</span></div>
+              <div class="row"><span class="k">二代健保</span><span class="v">單次 ≥ 2 萬 × 2.11%</span></div>
+              <div class="row"><span class="k">殖利率假設</span><span class="v mono">3%/年(示範)</span></div>
+              <div class="row"><span class="k">股利再投入</span><span class="v">以稅後計</span></div>
+            </div>
+            <p class="caption">單一個股之下市、併購、產業變化等風險無法由歷史報酬反映;個股試算為數學外推,不提供機率。</p>
+          </div>
+        </section>
+
+        <!-- 15 標的比較(F-13 前移驗證) ===================================== -->
+        <section class="screen" id="s-compare" data-name="標的比較">
+          <div class="appbar"><span class="title">標的比較</span><span class="spacer"></span><span class="chip">ETF 型</span></div>
+          <div class="body">
+            <p style="font-size:15px">相同投入、年齡與稅費假設下,兩檔 ETF 的達標時間對照。口徑相同,僅歷史樣本不同。</p>
+            <div class="card ledger" id="cmpTable"></div>
+            <p class="caption">同參數對照,非優劣排序;歷史樣本不代表未來,兩檔樣本期間長度不同(0050:276 月/0056:216 月)。殖利率假設一律 3%(示範),高股息型實際稅費 drag 會更高。</p>
+            <div class="section-label">個股?</div>
+            <p class="caption">個股僅提供確定性試算(單一假設),與 ETF 機率區間口徑不同,不納入本頁對照。</p>
+          </div>
+        </section>
+
+        <!-- 16 提領期(F-22 概念驗證) ======================================= -->
+        <section class="screen" id="s-decum" data-name="提領期(概念)">
+          <div class="appbar"><span class="title">提領期模擬</span><span class="spacer"></span><span class="chip">概念驗證</span></div>
+          <div class="body">
+            <div class="hero">
+              <p class="lead">退休後每月提領 <span class="mono" id="decumWOut">NT$ 50,000</span>,約一半的歷史情境能支應到</p>
+              <div class="figure mono" id="decumHero">—<span class="unit">歲</span></div>
+              <p class="caption">以 P50 中位數估算 — 歷史條件下的分佈,非未來機率之保證。月提領為今日購買力(實質)。</p>
+            </div>
+            <div class="card chart-card">
+              <svg viewBox="0 0 340 150" role="img" aria-label="提領期存摺線:退休日後餘額走勢區間,單色綠扇形向下收斂">
+                <g stroke="var(--rule)" stroke-width="1">
+                  <path d="M12 30 H328"/><path d="M12 70 H328"/><path d="M12 110 H328"/>
+                </g>
+                <path d="M90 18 V138" stroke="var(--rule)" stroke-width="1" stroke-dasharray="3 4"/>
+                <path d="M90 52 C170 66 240 96 322 132 L322 60 C240 54 170 50 90 52 Z" fill="var(--band)"/>
+                <path d="M90 52 C170 50 240 52 322 60" fill="none" stroke="var(--c90)" stroke-width="2"/>
+                <path d="M90 52 C170 66 240 96 322 132" fill="none" stroke="var(--a2)" stroke-width="2"/>
+                <path d="M90 52 C170 58 240 74 322 96" fill="none" stroke="var(--a1)" stroke-width="2.5"/>
+                <path class="printline" d="M22 96 L46 82 L68 66 L90 52" fill="none" stroke="var(--a1)" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="90" cy="52" r="4" fill="var(--a1)"/>
+                <text x="90" y="148" text-anchor="middle" font-family="var(--sans)" font-size="10" fill="var(--ink-soft)">退休日</text>
+              </svg>
+              <div class="chart-legend">
+                <span><i style="background:var(--a1)"></i>餘額中位軌跡</span>
+                <span><i style="background:var(--band)"></i>歷史分佈區間(示意)</span>
+              </div>
+            </div>
+            <div class="card chart-card">
+              <div class="slider-row">
+                <div class="lab"><span>每月提領</span><output class="mono" id="decumOut">NT$ 50,000</output></div>
+                <input type="range" min="20000" max="120000" step="5000" value="50000" id="decumRange" aria-label="每月提領金額">
+              </div>
+            </div>
+            <div class="card ledger">
+              <div class="row"><span class="k">起始資產(承接累積期目標)</span><span class="v mono" id="decumAssets">—</span></div>
+              <div class="row"><span class="k">保守(10% 情境更早用罄)</span><span class="v mono" id="decumP10">—</span></div>
+              <div class="row"><span class="k">中位</span><span class="v mono" id="decumP50">—</span></div>
+              <div class="row total"><span class="k">樂觀(90% 情境在此之前)</span><span class="v mono" id="decumP90">—</span></div>
+            </div>
+            <p class="caption">v2.0 概念驗證(F-22):僅 ETF 類適用;歸零 = 資產用罄;100+ 表示 60 年模擬期內未用罄。自 60 歲退休起算。</p>
+          </div>
+        </section>
+
         <div class="tabbar" role="tablist" aria-label="App 導覽">
           <button data-go="s-result-etf" data-tab="calc" aria-current="true">試算</button>
           <button data-go="s-track" data-tab="track">追蹤</button>
@@ -845,11 +945,54 @@ footer.demo-foot{
   }
   function currentAge(){ var el = document.getElementById("ageRange"); return el ? Number(el.value) : 35; }
   function planMonthly(){ var el = document.getElementById("advRange"); return el ? Number(el.value) : 15000; }
-  function mcRun(monthly, target){
-    return E.runMonteCarlo({ targetAmount: target == null ? DEMO.target : target, currentAssets: DEMO.current, netMonthlyContribution: monthly, monthlyReturns: realReturns, simulations: DEMO.sims, seed: DEMO.seed });
+  function mcRun(monthly, target, series){
+    var net = monthly, drag = 0;
+    if (feeIncluded) {
+      var p = taxProfile();
+      net = monthly * E.netContributionFactor(p);
+      drag = E.monthlyDividendDrag(p);
+    }
+    return E.runMonteCarlo({
+      targetAmount: target == null ? currentTarget() : target,
+      currentAssets: DEMO.current,
+      netMonthlyContribution: net,
+      monthlyReturns: series || realReturns,
+      monthlyDividendDrag: drag,
+      simulations: DEMO.sims,
+      seed: DEMO.seed,
+    });
   }
   function mAge(months){ return Number.isFinite(months) ? currentAge() + months / 12 : Infinity; }
   function fmtAge(a){ return Number.isFinite(a) ? String(Math.round(a)) : "80+"; }
+  function toReal(nomArr){
+    var out = new Float64Array(nomArr.length);
+    for (var i = 0; i < nomArr.length; i++) out[i] = (1 + nomArr[i]) / (1 + infM) - 1;
+    return out;
+  }
+
+  /* 稅費(F-08 §6.4:接 tax.ts;殖利率 3% 為示範假設,見方法揭露頁) */
+  var TAX = { incomeBracket: 0.12, brokerFeeDiscount: 0.6, dividendYield: 0.03, payoutsPerYear: 2, estimatedAnnualDividend: 0 };
+  var feeIncluded = true; /* 結果頁預設含稅費(PRD F-08) */
+  function taxProfile(){
+    TAX.estimatedAnnualDividend = (currentTarget() / 2) * TAX.dividendYield; /* 途中平均持倉近似 */
+    return TAX;
+  }
+
+  /* 缺口引導(F-09 §6.5:接 gap.ts) */
+  function swrValue(){
+    var b = document.querySelector('#swrChips button[aria-pressed="true"]');
+    return b ? parseFloat(b.textContent) / 100 : 0.04;
+  }
+  function gapValues(){
+    var exp = Number(document.getElementById("gapExpense").value);
+    var pension = Number(document.getElementById("gapLaobao").value) + Number(document.getElementById("gapLaotui").value);
+    return { exp: exp, pension: pension, gap: Math.max(0, exp - pension) };
+  }
+  function currentTarget(){
+    if (!E) return DEMO.target;
+    var g = gapValues();
+    return E.suggestedTargetAmount({ desiredMonthlyExpense: g.exp, estimatedMonthlyPension: g.pension, withdrawalRate: swrValue() });
+  }
 
   /* demo nav ------------------------------------------------------------ */
   var screens = Array.prototype.slice.call(document.querySelectorAll(".screen"));
@@ -1054,10 +1197,12 @@ footer.demo-foot{
     }
     setFanPaths(yForAge(a10), yForAge(a50), yForAge(a90));
     renderStock();
+    updateFeeNote();
   }
   function renderStock(){
     if (!E) return;
-    var months = E.solveMonths({ targetAmount: DEMO.target, currentAssets: DEMO.current, monthlyContribution: planMonthly(), annualReturn: DEMO.stockReturn, annualInflation: DEMO.inflation, maxMonths: 720 });
+    var gross = feeIncluded ? E.afterTaxAnnualReturn(DEMO.stockReturn, taxProfile()) : DEMO.stockReturn;
+    var months = E.solveMonths({ targetAmount: currentTarget(), currentAssets: DEMO.current, monthlyContribution: feeIncluded ? planMonthly() * E.netContributionFactor(TAX) : planMonthly(), annualReturn: gross, annualInflation: DEMO.inflation, maxMonths: 720 });
     var ageTxt = months == null ? "80+" : fmtAge(currentAge() + months / 12);
     document.getElementById("stockHero").innerHTML = ageTxt + '<span class="unit">歲</span><span class="verb">達標</span>';
     document.getElementById("stockAge").textContent = ageTxt + " 歲";
@@ -1067,17 +1212,21 @@ footer.demo-foot{
     if (!E) return;
     if (!SIM) SIM = mcRun(planMonthly());
     var m = planMonthly();
+    var target = currentTarget();
     var wish = Math.max(DEMO.wishAge, currentAge() + 1);
     var wishMonths = Math.round((wish - currentAge()) * 12);
     var realAnnual = Math.pow(1 + geoMonthly, 12) - 1; /* 合成樣本幾何平均(實質)*/
-    var fv = E.futureValue({ targetAmount: DEMO.target, currentAssets: DEMO.current, monthlyContribution: m, annualReturn: realAnnual }, wishMonths);
-    var gapWan = Math.max(0, Math.round((DEMO.target - fv) / 10000));
+    var fv = E.futureValue({ targetAmount: target, currentAssets: DEMO.current, monthlyContribution: m, annualReturn: realAnnual }, wishMonths);
+    var gapWan = Math.max(0, Math.round((target - fv) / 10000));
     document.getElementById("failAge").innerHTML = wish + '<span class="unit">歲</span>';
     document.getElementById("failGap").textContent = "NT$ " + gapWan.toLocaleString("en-US") + " 萬";
     var a1 = mAge(mcRun(m + 6000).p50Months);
     var aBase = mAge(SIM.p50Months);
     var delay = Number.isFinite(aBase) ? Math.max(1, Math.ceil(aBase - wish)) : null;
-    var a3 = mAge(mcRun(m + 5000, DEMO.target - 1500000).p50Months); /* 月支出降 5,000:目標 −150 萬(5,000×12÷4%)且可投入 +5,000 */
+    /* 月支出降 5,000:目標依 §6.5 重算(雙效:缺口變小 + 可投入 +5,000) */
+    var g = gapValues();
+    var target3 = E.suggestedTargetAmount({ desiredMonthlyExpense: g.exp - 5000, estimatedMonthlyPension: g.pension, withdrawalRate: swrValue() });
+    var a3 = mAge(mcRun(m + 5000, target3).p50Months);
     document.getElementById("failR1").innerHTML = fmtAge(a1) + " 歲<small>達標</small>";
     document.getElementById("failR2Label").textContent = delay == null ? "延後退休" : "延後退休 " + delay + " 年";
     document.getElementById("failR2").innerHTML = fmtAge(aBase) + " 歲<small>達標</small>";
@@ -1102,7 +1251,7 @@ footer.demo-foot{
     var failLink = document.getElementById("failLink");
     failLink.hidden = !(appMode && isFail());
   });
-  renderResults(); /* 初始渲染:預設值即為真引擎輸出 */
+  /* 初始渲染於檔尾 renderAll() */
 
   /* 帳本(F-12/§6.7:真引擎 ledger/xirr;示範合成交易,現價手動輸入)---------- */
   var LEDGER_TXNS = [
@@ -1171,18 +1320,179 @@ footer.demo-foot{
     guide.hidden = true;
   });
 
-  /* 設定:含/不含稅費 ------------------------------------------------------ */
+  /* 缺口引導渲染(F-09:gap.ts 動態計算) ----------------------------------- */
+  function renderGap(){
+    if (!document.getElementById("gapExpense")) return;
+    var g = gapValues(), target = currentTarget();
+    var swrPct = (swrValue() * 100).toFixed(1) + "%";
+    var wan = Math.round(target / 10000).toLocaleString("en-US");
+    document.getElementById("gapExpOut").textContent = fmtNT(g.exp);
+    document.getElementById("gapLbOut").textContent = fmtNT(Number(document.getElementById("gapLaobao").value));
+    document.getElementById("gapLtOut").textContent = fmtNT(Number(document.getElementById("gapLaotui").value));
+    document.getElementById("gapOut").innerHTML = fmtNT(g.gap) + "<small>/月</small>";
+    document.getElementById("goalHero").innerHTML = "NT$ " + wan + '<span class="unit">萬</span>';
+    document.getElementById("goalFormula").textContent = "= 每月缺口 " + g.gap.toLocaleString("en-US") + " 元 ÷ 提領率 " + swrPct + " × 12 個月";
+    document.getElementById("goalExp").textContent = fmtNT(g.exp);
+    document.getElementById("goalPension").textContent = fmtNT(g.pension);
+    document.getElementById("goalGap").innerHTML = fmtNT(g.gap) + "<small>/月</small>";
+    document.getElementById("goalSwr").textContent = swrPct;
+    document.getElementById("goalTarget").textContent = fmtNT(target);
+    document.getElementById("setSwr").textContent = swrPct;
+    document.getElementById("setExp").textContent = fmtNT(g.exp);
+    document.getElementById("setPension").innerHTML = fmtNT(g.pension) + "<small>/月</small>";
+    document.getElementById("failTargetLabel").textContent = "目標 NT$ " + wan + " 萬";
+  }
+
+  /* 稅費差異註記(F-08:兩次真模擬對照) ------------------------------------ */
+  function updateFeeNote(){
+    var note = document.getElementById("feeNote");
+    if (!E || !note) return;
+    var v = planMonthly(), keep = feeIncluded;
+    feeIncluded = true;  var on = mAge(mcRun(v).p50Months);
+    feeIncluded = false; var off = mAge(mcRun(v).p50Months);
+    feeIncluded = keep;
+    if (!Number.isFinite(on) || !Number.isFinite(off)) { note.textContent = "目前參數下難以達標,先調整計畫再看稅費差異。"; return; }
+    var diff = (on - off).toFixed(1);
+    note.textContent = keep
+      ? "含稅費試算:P50 達標年齡 " + fmtAge(on) + " 歲(較不含稅費 +" + diff + " 年)。"
+      : "不含稅費試算:P50 達標年齡 " + fmtAge(off) + " 歲(含稅費為 +" + diff + " 年,實際請以含稅費為準)。";
+  }
+
+  /* 標的並排比較(F-13 前移驗證) ------------------------------------------ */
+  var REAL56 = null;
+  function renderCompare(){
+    var tableEl = document.getElementById("cmpTable");
+    if (!E || !tableEl) return;
+    if (!REAL56) REAL56 = toReal(E.fixtures.series0056.adjustedReturns);
+    var defs = [
+      { label: "0050 · 市值型", series: null },
+      { label: "0056 · 高股息", series: REAL56 },
+    ];
+    var res = defs.map(function(d){
+      var r = mcRun(planMonthly(), null, d.series);
+      return { label: d.label, a10: mAge(r.p10Months), a50: mAge(r.p50Months), a90: mAge(r.p90Months) };
+    });
+    var html = "";
+    res.forEach(function(x){
+      html += '<div class="row"><span class="k">' + x.label + '</span><span class="v mono">P50 ' + fmtAge(x.a50) + " 歲(" + fmtAge(x.a10) + "–" + fmtAge(x.a90) + ")</span></div>";
+    });
+    var d50 = Number.isFinite(res[0].a50) && Number.isFinite(res[1].a50) ? Math.abs(res[1].a50 - res[0].a50).toFixed(1) : "—";
+    html += '<div class="row total"><span class="k">P50 差異</span><span class="v mono">' + d50 + " 年</span></div>";
+    tableEl.innerHTML = html;
+  }
+
+  /* 提領期(F-22 §6.8 概念驗證) ------------------------------------------- */
+  var decumTouched = false;
+  function renderDecum(){
+    var el = document.getElementById("decumRange");
+    if (!E || !el) return;
+    if (!decumTouched) {
+      var def = Math.round((currentTarget() * swrValue()) / 12 / 5000) * 5000;
+      el.value = Math.min(120000, Math.max(20000, def));
+    }
+    var w = Number(el.value);
+    var assets = currentTarget();
+    var r = E.runDecumulation({ initialAssets: Math.max(1, assets), monthlyWithdrawal: w, monthlyReturns: realReturns, simulations: DEMO.sims, seed: DEMO.seed });
+    var retAge = Math.max(DEMO.wishAge, currentAge() + 1);
+    var dAge = function(mo){
+      if (!Number.isFinite(mo)) return "100+";
+      var a = retAge + mo / 12;
+      return a >= 100 ? "100+" : String(Math.round(a));
+    };
+    document.getElementById("decumWOut").textContent = "NT$ " + w.toLocaleString("en-US");
+    document.getElementById("decumOut").textContent = "NT$ " + w.toLocaleString("en-US");
+    document.getElementById("decumHero").innerHTML = dAge(r.p50Months) + '<span class="unit">歲</span>';
+    document.getElementById("decumAssets").textContent = fmtNT(assets);
+    document.getElementById("decumP10").textContent = dAge(r.p10Months) + " 歲";
+    document.getElementById("decumP50").textContent = dAge(r.p50Months) + " 歲";
+    document.getElementById("decumP90").textContent = dAge(r.p90Months) + " 歲";
+  }
+
+  /* 配息自動生成示意(F-17:mock 除息事件 × 真持股) ------------------------- */
+  var AUTO_DIV_EVENTS = [
+    { symbol: "0050", exDate: "2026-07-17", perShare: 1.8 },
+    { symbol: "0056", exDate: "2026-07-24", perShare: 0.7 },
+    { symbol: "2330", exDate: "2026-09-17", perShare: 4.5 },
+  ];
+  function renderAutoDiv(){
+    var el = document.getElementById("lgAutoDiv");
+    if (!E || !el) return;
+    var holdings = E.buildHoldings(LEDGER_TXNS, { brokerFeeDiscount: 0.6 });
+    var html = "", total = 0;
+    AUTO_DIV_EVENTS.forEach(function(ev){
+      var h = holdings.get(ev.symbol);
+      if (!h || h.shares <= 0) return;
+      var amt = h.shares * ev.perShare;
+      total += amt;
+      html += '<div class="row"><span class="k">' + ev.exDate + " " + ev.symbol + " 除息 " + ev.perShare.toFixed(2) + "/股 × " + h.shares.toLocaleString("en-US") + ' 股</span><span class="v mono">+' + fmtNT(amt) + "</span></div>";
+    });
+    html += '<div class="row total"><span class="k">待確認入帳(可編輯)</span><span class="v mono">+' + fmtNT(total) + "</span></div>";
+    el.innerHTML = html;
+  }
+
+  /* 自導覽模式(?tour=1:三幕腳本,給不在場的觀眾) --------------------------- */
+  var TOUR = [
+    { s: "s-disclaimer", t: "任務:讓每個台灣人誠實地知道自己幾歲能退休。開始之前先誠實揭露 — 這是一份試算,不是承諾。" },
+    { s: "s-result-etf", t: "核心答案是一個數字。存摺分岔線:左邊是已印好的事實,右邊只有範圍。所有數字皆為引擎即時計算。" },
+    { s: "s-gap", t: "數字怎麼來?從缺口開始 — 勞保勞退先扣掉,剩下的才是要自己準備的。三個輸入都可拉動。" },
+    { s: "s-goal", t: "缺口 ÷ 提領率 = 目標資產,公式攤開給你看。" },
+    { s: "s-invest", t: "投入與年齡即時重算 — 拉動滑桿,結果頁跟著變。" },
+    { s: "s-target", t: "兩種標的,兩種誠實:ETF 給機率,個股只給單一假設。" },
+    { s: "s-result-stock", t: "個股頁沒有機率語句 — 對單一公司,我們算不出誠實的機率。" },
+    { s: "s-fail", t: "誠實的極致:做不到就說做不到,並給三條路,每條都重新試算過。" },
+    { s: "s-ledger", t: "留存主賭注:交易帳本 — 已實現/未實現損益、配息彙總、三數字誠實對照。" },
+    { s: "s-decum", t: "更遠的方向:從『幾歲退休』到『錢夠花到幾歲』— 提領期模擬概念驗證。" },
+  ];
+  if (qs.get("tour") === "1") {
+    var tourIdx = 0;
+    var bar = document.createElement("div");
+    bar.className = "guide";
+    bar.style.cssText = "position:fixed;left:50%;transform:translateX(-50%);bottom:18px;width:min(560px,92vw);z-index:50;background:var(--surf);border-style:solid";
+    bar.innerHTML = '<span class="g-step" id="tourText"></span><div class="g-actions"><button id="tourPrev">上一步</button><button id="tourNext">下一步</button><button id="tourExit">離開導覽</button></div>';
+    document.body.appendChild(bar);
+    var showTour = function(){
+      var st = TOUR[tourIdx];
+      showById(st.s);
+      document.getElementById("tourText").textContent = (tourIdx + 1) + "/" + TOUR.length + " · " + st.t;
+      document.getElementById("tourPrev").style.visibility = tourIdx === 0 ? "hidden" : "visible";
+      document.getElementById("tourNext").textContent = tourIdx === TOUR.length - 1 ? "重新開始" : "下一步";
+    };
+    document.getElementById("tourNext").addEventListener("click", function(){ tourIdx = (tourIdx + 1) % TOUR.length; showTour(); });
+    document.getElementById("tourPrev").addEventListener("click", function(){ tourIdx = Math.max(0, tourIdx - 1); showTour(); });
+    document.getElementById("tourExit").addEventListener("click", function(){ bar.remove(); });
+    showTour();
+  }
+
+  /* 設定:含/不含稅費(F-08:真計算切換) ------------------------------------ */
   var feeOn = document.getElementById("feeOn"), feeOff = document.getElementById("feeOff");
-  var feeNote = document.getElementById("feeNote");
   function setFee(inc){
+    feeIncluded = inc;
     feeOn.setAttribute("aria-pressed", String(inc));
     feeOff.setAttribute("aria-pressed", String(!inc));
-    feeNote.textContent = inc
-      ? "含稅費試算:P50 達標年齡 58 歲(較不含稅費 +1.5 年)。"
-      : "不含稅費試算:P50 達標年齡 56.5 歲(實際請以含稅費為準)。";
+    renderAll();
   }
   feeOn.addEventListener("click", function(){ setFee(true); });
   feeOff.addEventListener("click", function(){ setFee(false); });
+
+  /* 缺口/提領率/級距 事件與初始渲染 ---------------------------------------- */
+  ["gapExpense", "gapLaobao", "gapLaotui"].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.addEventListener("input", function(){ renderAll(); });
+  });
+  var swrGroup = document.getElementById("swrChips");
+  if (swrGroup) swrGroup.addEventListener("click", function(e){ if (e.target.closest("button")) renderAll(); });
+  var taxGroup = document.getElementById("taxChips");
+  if (taxGroup) taxGroup.addEventListener("click", function(e){
+    var b = e.target.closest("button");
+    if (!b) return;
+    TAX.incomeBracket = parseFloat(b.textContent) / 100;
+    renderAll();
+  });
+  var decumEl = document.getElementById("decumRange");
+  if (decumEl) decumEl.addEventListener("input", function(){ decumTouched = true; renderDecum(); });
+  function renderAll(){ renderGap(); renderResults(); renderCompare(); renderDecum(); }
+  renderAll();
+  renderAutoDiv();
 })();
 </script>
 </body>
