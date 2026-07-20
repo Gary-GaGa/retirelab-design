@@ -7,6 +7,7 @@ Live Demo:https://gary-gaga.github.io/retirelab-design/
 
 | 匯出日期 | 檔案 | 對應 PRD 版本 | 涵蓋畫面 / 備註 |
 |---|---|---|---|
+| 2026-07-20 | index.html(持股輸入→試算起點) | PRD v0.8 F-12×F-01 | 帳本頁新增「新增持股」表單(標的 chips 由 fixtures metadata 動態生成含 00940 短史警示,Rule 2;股數/含費用成本/手動現價);投入頁「已累積資產」可切換手動示範值/帳本市值(portfolioValue),切換後全下游試算連動。navtest 增 2 項斷言(共 24 項) |
 | 2026-07-20 | index.html + engine.js(Demo 完整化) | PRD v0.8 | 共 16 畫面。①MVP 補完:缺口引導三滑桿接 `gap.ts`(目標動態化,全下游連動)、稅費接 `tax.ts`(級距 chips/含不含切換真算,feeNote 動態:12% 級距實測差 +0.4 年)、新增「方法揭露」頁;②v1.1 前移:「標的比較」頁(0050 vs 0056 雙 MC,P50 差 2.4 年)、帳本「配息自動生成」示意(mock 除息事件 × 真持股);③v2.0 概念驗證:「提領期」頁接 engine `decumulation`(§6.8);④`?tour=1` 自導覽(10 步三幕腳本)。navtest 增 7 項斷言 |
 | 2026-07-20 | index.html(帳本畫面組出稿) | PRD v0.7 F-12 / §6.7 | 新增第 11 畫面「帳本」+ tabbar 第 4 tab:持有市值 hero、持股卡(均價/未實現損益)、三數字誠實對照(簡單法/XIRR/計畫假設,口徑標示)、已實現損益、年度配息(總額+最大標的)、最近交易(含手續費/證交稅)。全部數字由 engine ledger/xirr 模組計算(合成交易 9 筆、現價手動輸入,Rule 3/7);文案沿用 copy-registry ledger.* 條目;損益以 +/− 中性呈現(禁紅綠漲跌)。共 13 畫面 |
 | 2026-07-20 | index.html + engine.js(真引擎接線) | PRD v0.7 | demo 數字全面改為 `@retirelab/engine` 真實輸出:`engine.js`(9.5KB IIFE,主 repo `npm run bundle:demo-engine` 產生,內含 fixtures 合成資料)驅動 ETF 結果(MC 1,000 次、seed 42、實質報酬=名目÷通膨 2%)、個股封閉解、無法達標頁(門檻:60 歲前退休);示範情境改為目標 1,500 萬/缺口 50,000(原 375 萬在合成報酬下全情境過早達標,故事撐不起來);投入/年齡/進階 slider 雙向同步且驅動真模擬;結果頁 caption 標示合成資料+通膨假設;追蹤頁進度改 1,400,000(修正報酬=0 的不自洽);無引擎時 fallback 舊估算式。每年調升 slider 仍為純視覺(engine 未支援投入遞增)。navtest ALL-PASS、audit_tokens 歸零 |

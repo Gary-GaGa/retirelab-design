@@ -60,6 +60,17 @@ document.getElementById("f").addEventListener("load", function(){
     results.push((cmpOk ? "PASS" : "FAIL") + " 標的比較引擎數字已渲染");
     var dcOk = doc.getElementById("decumHero") && doc.getElementById("decumHero").textContent.indexOf("—") < 0;
     results.push((dcOk ? "PASS" : "FAIL") + " 提領期引擎數字已渲染");
+    /* 持股輸入 → 已累積資產連動(F-12 進度整合) */
+    click(doc, "#assetLedger");
+    var avLedger = doc.getElementById("assetVal").textContent;
+    results.push((avLedger.indexOf("800,000") < 0 ? "PASS" : "FAIL") + " 已累積資產→帳本市值連動");
+    doc.getElementById("holdShares").value = 1000;
+    doc.getElementById("holdCost").value = 100;
+    doc.getElementById("holdPrice").value = 132;
+    click(doc, "#holdAdd");
+    var avAfter = doc.getElementById("assetVal").textContent;
+    results.push((avAfter !== avLedger ? "PASS" : "FAIL") + " 新增持股→試算起點重算");
+    click(doc, "#assetManual");
     var pass = results.filter(function(r){ return r.indexOf("FAIL") === 0; }).length === 0;
     document.getElementById("out").textContent =
       "NAVTEST " + (pass ? "ALL-PASS" : "HAS-FAIL") + "\n" + results.join("\n");

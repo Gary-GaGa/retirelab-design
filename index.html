@@ -247,6 +247,12 @@ input[type="range"]{width:100%;accent-color:var(--a1);height:28px}
 .guide .g-actions button{color:var(--a1);font-weight:700;font-size:13px;min-height:32px}
 .guide .g-step{font-weight:600}
 
+/* field input(帳本持股輸入)----------------------------------------------- */
+.field-row input{
+  width:130px;margin-left:auto;text-align:right;font-family:var(--mono);font-size:14px;
+  background:var(--surf);border:1px solid var(--rule);border-radius:8px;padding:6px 8px;color:var(--ink);
+}
+
 /* onboarding progress ---------------------------------------------------- */
 .steps{display:flex;align-items:center;gap:6px}
 .steps i{height:3px;flex:1;background:var(--rule);border-radius:2px}
@@ -430,8 +436,13 @@ footer.demo-foot{
                 <div class="lab"><span>目前年齡</span><output class="mono" id="ageOut">35 歲</output></div>
                 <input type="range" min="18" max="80" step="1" value="35" id="ageRange" aria-label="目前年齡">
               </div>
-              <div class="row"><span class="k">已累積資產</span><span class="v">NT$ 800,000</span></div>
+              <div class="row"><span class="k">已累積資產</span><span class="v" id="assetVal">NT$ 800,000</span></div>
             </div>
+            <div class="seg" role="group" aria-label="已累積資產來源">
+              <button id="assetManual" aria-pressed="true">手動輸入</button>
+              <button id="assetLedger" aria-pressed="false">帳本市值</button>
+            </div>
+            <p class="caption" id="assetNote">預設為示範值;切換「帳本市值」後,以帳本持股 × 手動現價計入試算起點。</p>
             <div class="card chart-card">
               <div class="slider-row">
                 <div class="lab"><span>每月投入</span><output class="mono" id="investOut">NT$ 15,000</output></div>
@@ -699,6 +710,19 @@ footer.demo-foot{
               <div class="figure mono" style="font-size:44px" id="lgValue">NT$ —</div>
               <p class="caption">現價為手動輸入,非即時行情;市值與未實現損益依你輸入之價格計算。</p>
             </div>
+            <div class="section-label">新增持股(手動輸入)</div>
+            <div class="card ledger">
+              <div class="row" style="flex-wrap:wrap;gap:8px;padding:10px 0">
+                <span class="k" style="width:100%">標的</span>
+                <div class="chips" id="holdSymChips" role="group" aria-label="標的"></div>
+              </div>
+              <p class="caption" id="holdWarn" hidden>上市未滿 10 年,歷史樣本不足,模擬可信度低。</p>
+              <div class="row field-row"><span class="k">股數</span><input type="number" id="holdShares" min="1" step="1" value="1000" aria-label="股數"></div>
+              <div class="row field-row"><span class="k">每股成本(含費用)</span><input type="number" id="holdCost" min="0.01" step="0.1" value="120" aria-label="每股成本"></div>
+              <div class="row field-row"><span class="k">目前現價(手動)</span><input type="number" id="holdPrice" min="0.01" step="0.1" value="132" aria-label="目前現價"></div>
+              <div class="btn-row" style="padding:8px 0 4px"><button class="btn primary" id="holdAdd">加入帳本</button></div>
+            </div>
+            <p class="caption">現價為手動輸入,非即時行情(Q2 前無行情源);成本以含費用計,加入即以平均成本法併入持股,並可作為試算起點(投入頁切換)。</p>
             <div class="section-label">未實現損益(平均成本法,含買進手續費)</div>
             <div class="card ledger" id="lgHoldings"></div>
             <div class="section-label">三數字誠實對照</div>
@@ -954,7 +978,7 @@ footer.demo-foot{
     }
     return E.runMonteCarlo({
       targetAmount: target == null ? currentTarget() : target,
-      currentAssets: DEMO.current,
+      currentAssets: currentAssets(),
       netMonthlyContribution: net,
       monthlyReturns: series || realReturns,
       monthlyDividendDrag: drag,
@@ -992,6 +1016,16 @@ footer.demo-foot{
     if (!E) return DEMO.target;
     var g = gapValues();
     return E.suggestedTargetAmount({ desiredMonthlyExpense: g.exp, estimatedMonthlyPension: g.pension, withdrawalRate: swrValue() });
+  }
+
+  /* 已累積資產來源(F-12 進度整合 → F-01:帳本市值可作為試算起點) */
+  var assetFromLedger = false;
+  var USER_TXNS = []; /* 使用者手動輸入之持股(帳本頁表單) */
+  function allTxns(){ return LEDGER_TXNS.concat(USER_TXNS); }
+  function currentAssets(){
+    if (!assetFromLedger || !E) return DEMO.current;
+    var snap = E.buildLedgerSnapshot(allTxns(), { brokerFeeDiscount: 0.6 });
+    return E.portfolioValue(snap.holdings, LEDGER_PRICES);
   }
 
   /* demo nav ------------------------------------------------------------ */
@@ -1202,7 +1236,7 @@ footer.demo-foot{
   function renderStock(){
     if (!E) return;
     var gross = feeIncluded ? E.afterTaxAnnualReturn(DEMO.stockReturn, taxProfile()) : DEMO.stockReturn;
-    var months = E.solveMonths({ targetAmount: currentTarget(), currentAssets: DEMO.current, monthlyContribution: feeIncluded ? planMonthly() * E.netContributionFactor(TAX) : planMonthly(), annualReturn: gross, annualInflation: DEMO.inflation, maxMonths: 720 });
+    var months = E.solveMonths({ targetAmount: currentTarget(), currentAssets: currentAssets(), monthlyContribution: feeIncluded ? planMonthly() * E.netContributionFactor(TAX) : planMonthly(), annualReturn: gross, annualInflation: DEMO.inflation, maxMonths: 720 });
     var ageTxt = months == null ? "80+" : fmtAge(currentAge() + months / 12);
     document.getElementById("stockHero").innerHTML = ageTxt + '<span class="unit">歲</span><span class="verb">達標</span>';
     document.getElementById("stockAge").textContent = ageTxt + " 歲";
@@ -1216,7 +1250,7 @@ footer.demo-foot{
     var wish = Math.max(DEMO.wishAge, currentAge() + 1);
     var wishMonths = Math.round((wish - currentAge()) * 12);
     var realAnnual = Math.pow(1 + geoMonthly, 12) - 1; /* 合成樣本幾何平均(實質)*/
-    var fv = E.futureValue({ targetAmount: target, currentAssets: DEMO.current, monthlyContribution: m, annualReturn: realAnnual }, wishMonths);
+    var fv = E.futureValue({ targetAmount: target, currentAssets: currentAssets(), monthlyContribution: m, annualReturn: realAnnual }, wishMonths);
     var gapWan = Math.max(0, Math.round((target - fv) / 10000));
     document.getElementById("failAge").innerHTML = wish + '<span class="unit">歲</span>';
     document.getElementById("failGap").textContent = "NT$ " + gapWan.toLocaleString("en-US") + " 萬";
@@ -1272,10 +1306,10 @@ footer.demo-foot{
   function renderLedger(){
     if (!E || !document.getElementById("lgValue")) return;
     var cfg = { brokerFeeDiscount: 0.6 };
-    var snap = E.buildLedgerSnapshot(LEDGER_TXNS, cfg);
+    var snap = E.buildLedgerSnapshot(allTxns(), cfg);
     var value = E.portfolioValue(snap.holdings, LEDGER_PRICES);
     var un = E.unrealizedPnL(snap.holdings, LEDGER_PRICES);
-    var div = E.dividendSummary(LEDGER_TXNS, 2026);
+    var div = E.dividendSummary(allTxns(), 2026);
     document.getElementById("lgValue").textContent = fmtNT(value);
     var hold = "";
     snap.holdings.forEach(function(h){
@@ -1284,17 +1318,17 @@ footer.demo-foot{
     });
     hold += '<div class="row total"><span class="k">未實現損益合計</span><span class="v mono">' + fmtSigned(un.total) + "</span></div>";
     document.getElementById("lgHoldings").innerHTML = hold;
-    var flows = LEDGER_TXNS.map(function(t){ return { date: t.date, amount: E.transactionCashFlow(t, cfg) }; });
+    var flows = allTxns().map(function(t){ return { date: t.date, amount: E.transactionCashFlow(t, cfg) }; });
     flows.push({ date: "2026-07-20", amount: value });
     var rate = E.xirr(flows);
-    document.getElementById("lgNaive").textContent = fmtPct(E.naiveTotalReturn(LEDGER_TXNS, cfg, value));
+    document.getElementById("lgNaive").textContent = fmtPct(E.naiveTotalReturn(allTxns(), cfg, value));
     document.getElementById("lgXirr").textContent = rate == null ? "—" : fmtPct(rate) + "/年";
     document.getElementById("lgPlan").textContent = "+" + ((Math.pow(1 + geoMonthly, 12) - 1) * 100).toFixed(1) + "%/年";
     document.getElementById("lgRealized").textContent = fmtSigned(snap.realized.total);
     document.getElementById("lgDivTotal").textContent = fmtNT(div.total);
     document.getElementById("lgDivTop").textContent = div.top ? div.top.symbol + " · " + fmtNT(div.top.amount) : "—";
     var tx = "";
-    LEDGER_TXNS.slice(-5).reverse().forEach(function(t){
+    allTxns().slice(-5).reverse().forEach(function(t){
       var label = t.date + " " + t.symbol + " " + (t.type === "buy" ? "買進 " + t.shares.toLocaleString("en-US") + " 股" : t.type === "sell" ? "賣出 " + t.shares.toLocaleString("en-US") + " 股" : "配息");
       tx += '<div class="row"><span class="k">' + label + '</span><span class="v mono">' + fmtSigned(E.transactionCashFlow(t, cfg)) + "</span></div>";
     });
@@ -1417,7 +1451,7 @@ footer.demo-foot{
   function renderAutoDiv(){
     var el = document.getElementById("lgAutoDiv");
     if (!E || !el) return;
-    var holdings = E.buildHoldings(LEDGER_TXNS, { brokerFeeDiscount: 0.6 });
+    var holdings = E.buildHoldings(allTxns(), { brokerFeeDiscount: 0.6 });
     var html = "", total = 0;
     AUTO_DIV_EVENTS.forEach(function(ev){
       var h = holdings.get(ev.symbol);
@@ -1463,6 +1497,77 @@ footer.demo-foot{
     showTour();
   }
 
+  /* 持股輸入(F-12:手動持股 → 帳本 → 試算起點;標的清單來自 fixtures metadata,Rule 2) */
+  function symbolMeta(sym){
+    if (!E) return null;
+    return E.fixtures.symbols.symbols.find(function(x){ return x.symbol === sym; }) || null;
+  }
+  function selectedHoldSymbol(){
+    var b = document.querySelector('#holdSymChips button[aria-pressed="true"]');
+    return b ? b.textContent : "0050";
+  }
+  function renderAssets(){
+    var el = document.getElementById("assetVal");
+    if (!el) return;
+    var note = document.getElementById("assetNote");
+    if (assetFromLedger && E) {
+      var snap = E.buildLedgerSnapshot(allTxns(), { brokerFeeDiscount: 0.6 });
+      var count = 0;
+      snap.holdings.forEach(function(h){ if (h.shares > 0) count++; });
+      el.textContent = fmtNT(currentAssets());
+      note.textContent = "來自帳本 " + count + " 檔持股 × 手動現價;於帳本頁新增或調整。";
+    } else {
+      el.textContent = fmtNT(DEMO.current);
+      note.textContent = "預設為示範值;切換「帳本市值」後,以帳本持股 × 手動現價計入試算起點。";
+    }
+  }
+  (function initHoldings(){
+    var chipsEl = document.getElementById("holdSymChips");
+    if (!chipsEl || !E) return;
+    E.fixtures.symbols.symbols.forEach(function(m, i){
+      var b = document.createElement("button");
+      b.textContent = m.symbol;
+      b.setAttribute("aria-pressed", String(i === 0));
+      chipsEl.appendChild(b);
+    });
+    chipsEl.addEventListener("click", function(e){
+      var b = e.target.closest("button");
+      if (!b) return;
+      chipsEl.querySelectorAll("button").forEach(function(x){ x.setAttribute("aria-pressed", "false"); });
+      b.setAttribute("aria-pressed", "true");
+      var meta = symbolMeta(b.textContent);
+      document.getElementById("holdWarn").hidden = !(meta && meta.warning === "short-history");
+      if (LEDGER_PRICES[b.textContent] != null) {
+        document.getElementById("holdPrice").value = LEDGER_PRICES[b.textContent];
+        document.getElementById("holdCost").value = LEDGER_PRICES[b.textContent];
+      }
+    });
+    document.getElementById("holdAdd").addEventListener("click", function(){
+      var sym = selectedHoldSymbol();
+      var meta = symbolMeta(sym);
+      var shares = Number(document.getElementById("holdShares").value);
+      var cost = Number(document.getElementById("holdCost").value);
+      var price = Number(document.getElementById("holdPrice").value);
+      if (!meta || !(shares > 0) || !(cost > 0) || !(price > 0)) return;
+      /* 成本輸入視為含費用之每股成本 → feeOverride:0 使平均成本 = 輸入值 */
+      USER_TXNS.push({ date: "2026-07-20", symbol: sym, assetClass: meta.assetClass, type: "buy", shares: shares, price: cost, feeOverride: 0 });
+      LEDGER_PRICES[sym] = price;
+      renderLedger();
+      renderAutoDiv();
+      renderAssets();
+      if (assetFromLedger) renderAll();
+    });
+    var aM = document.getElementById("assetManual"), aL = document.getElementById("assetLedger");
+    function setAssetSource(fromLedger){
+      assetFromLedger = fromLedger;
+      aM.setAttribute("aria-pressed", String(!fromLedger));
+      aL.setAttribute("aria-pressed", String(fromLedger));
+      renderAll();
+    }
+    aM.addEventListener("click", function(){ setAssetSource(false); });
+    aL.addEventListener("click", function(){ setAssetSource(true); });
+  })();
+
   /* 設定:含/不含稅費(F-08:真計算切換) ------------------------------------ */
   var feeOn = document.getElementById("feeOn"), feeOff = document.getElementById("feeOff");
   function setFee(inc){
@@ -1490,7 +1595,7 @@ footer.demo-foot{
   });
   var decumEl = document.getElementById("decumRange");
   if (decumEl) decumEl.addEventListener("input", function(){ decumTouched = true; renderDecum(); });
-  function renderAll(){ renderGap(); renderResults(); renderCompare(); renderDecum(); }
+  function renderAll(){ renderGap(); renderResults(); renderCompare(); renderDecum(); renderAssets(); }
   renderAll();
   renderAutoDiv();
 })();
