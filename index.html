@@ -247,6 +247,10 @@ input[type="range"]{width:100%;accent-color:var(--a1);height:28px}
 .guide .g-actions button{color:var(--a1);font-weight:700;font-size:13px;min-height:32px}
 .guide .g-step{font-weight:600}
 
+/* holding rows(帳本配置列,可點入明細)-------------------------------------- */
+button.holding-row{cursor:pointer;background:none;border:0;font:inherit;width:100%;text-align:left}
+.sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:7px;vertical-align:-1px}
+
 /* field input(帳本持股輸入)----------------------------------------------- */
 .field-row input{
   width:130px;margin-left:auto;text-align:right;font-family:var(--mono);font-size:14px;
@@ -306,7 +310,7 @@ footer.demo-foot{
     </svg>
     <div>
       <h1>幾歲退休 — 設計稿</h1>
-      <div class="sub">v0.2 · 16 畫面 · DESIGN_SPEC「存摺分岔線」</div>
+      <div class="sub">v0.2 · 17 畫面 · DESIGN_SPEC「存摺分岔線」</div>
     </div>
     <div class="spacer"></div>
     <div class="seg" role="group" aria-label="Demo 模式">
@@ -710,20 +714,10 @@ footer.demo-foot{
               <div class="figure mono" style="font-size:44px" id="lgValue">NT$ —</div>
               <p class="caption">現價為手動輸入,非即時行情;市值與未實現損益依你輸入之價格計算。</p>
             </div>
-            <div class="section-label">新增持股(手動輸入)</div>
-            <div class="card ledger">
-              <div class="row" style="flex-wrap:wrap;gap:8px;padding:10px 0">
-                <span class="k" style="width:100%">標的</span>
-                <div class="chips" id="holdSymChips" role="group" aria-label="標的"></div>
-              </div>
-              <p class="caption" id="holdWarn" hidden>上市未滿 10 年,歷史樣本不足,模擬可信度低。</p>
-              <div class="row field-row"><span class="k">股數</span><input type="number" id="holdShares" min="1" step="1" value="1000" aria-label="股數"></div>
-              <div class="row field-row"><span class="k">每股成本(含費用)</span><input type="number" id="holdCost" min="0.01" step="0.1" value="120" aria-label="每股成本"></div>
-              <div class="row field-row"><span class="k">目前現價(手動)</span><input type="number" id="holdPrice" min="0.01" step="0.1" value="132" aria-label="目前現價"></div>
-              <div class="btn-row" style="padding:8px 0 4px"><button class="btn primary" id="holdAdd">加入帳本</button></div>
+            <div class="section-label">持股配置(依市值;點列可看明細與調整)</div>
+            <div class="card chart-card">
+              <svg viewBox="0 0 340 40" id="lgAllocBar" role="img" aria-label="持股市值占比橫條圖:單色綠明度階,列表為圖例與數值"></svg>
             </div>
-            <p class="caption">現價為手動輸入,非即時行情(Q2 前無行情源);成本以含費用計,加入即以平均成本法併入持股,並可作為試算起點(投入頁切換)。</p>
-            <div class="section-label">未實現損益(平均成本法,含買進手續費)</div>
             <div class="card ledger" id="lgHoldings"></div>
             <div class="section-label">三數字誠實對照</div>
             <div class="card ledger">
@@ -738,9 +732,19 @@ footer.demo-foot{
               <div class="row"><span class="k">2026 年總配息(實領金額)</span><span class="v mono" id="lgDivTotal">—</span></div>
               <div class="row total"><span class="k">配息金額最大標的</span><span class="v mono" id="lgDivTop">—</span></div>
             </div>
-            <div class="section-label">最近交易(含手續費與證交稅)</div>
-            <div class="card ledger" id="lgTxns"></div>
-            <p class="caption">手動買賣/配息紀錄 → 自動推導持股與損益;賣超會被拒絕。示範資料為合成情境。</p>
+            <div class="section-label">新增持股(手動輸入)</div>
+            <div class="card ledger">
+              <div class="row" style="flex-wrap:wrap;gap:8px;padding:10px 0">
+                <span class="k" style="width:100%">標的</span>
+                <div class="chips" id="holdSymChips" role="group" aria-label="標的"></div>
+              </div>
+              <p class="caption" id="holdWarn" hidden>上市未滿 10 年,歷史樣本不足,模擬可信度低。</p>
+              <div class="row field-row"><span class="k">股數</span><input type="number" id="holdShares" min="1" step="1" value="1000" aria-label="股數"></div>
+              <div class="row field-row"><span class="k">每股成本(含費用)</span><input type="number" id="holdCost" min="0.01" step="0.1" value="120" aria-label="每股成本"></div>
+              <div class="row field-row"><span class="k">目前現價(手動)</span><input type="number" id="holdPrice" min="0.01" step="0.1" value="132" aria-label="目前現價"></div>
+              <div class="btn-row" style="padding:8px 0 4px"><button class="btn primary" id="holdAdd">加入帳本</button></div>
+            </div>
+            <p class="caption">現價為手動輸入,非即時行情(Q2 前無行情源);成本以含費用計,加入即以平均成本法併入持股,並可作為試算起點(投入頁切換)。單筆交易明細移至各持股頁。</p>
             <div class="section-label">配息自動生成(示意,F-17)</div>
             <div class="card ledger" id="lgAutoDiv"></div>
             <p class="caption">依持股 × 除息事件自動代入現金股利,可編輯後入帳;正式功能依賴 Q2 資料授權之公司行動事件庫,本區為合成事件示意。</p>
@@ -925,6 +929,41 @@ footer.demo-foot{
               <div class="row total"><span class="k">樂觀(90% 情境在此之前)</span><span class="v mono" id="decumP90">—</span></div>
             </div>
             <p class="caption">v2.0 概念驗證(F-22):僅 ETF 類適用;歸零 = 資產用罄;100+ 表示 60 年模擬期內未用罄。自 60 歲退休起算。</p>
+          </div>
+        </section>
+
+        <!-- 17 持股明細 ==================================================== -->
+        <section class="screen" id="s-holding" data-name="持股明細">
+          <div class="appbar">
+            <button class="link" data-go="s-ledger">← 帳本</button>
+            <span class="title" id="hdTitle" style="margin-left:8px">0050</span>
+            <span class="spacer"></span>
+            <span class="chip" id="hdClass">機率試算</span>
+          </div>
+          <div class="body">
+            <div class="hero">
+              <p class="lead" id="hdName">元大台灣50(合成)</p>
+              <div class="figure mono" style="font-size:40px" id="hdValue">—</div>
+              <p class="caption" id="hdShare">占投組 —% · 現價為手動輸入,非即時行情。</p>
+            </div>
+            <p class="caption" id="hdWarn" hidden>上市未滿 10 年,歷史樣本不足,模擬可信度低。</p>
+            <div class="card ledger">
+              <div class="row"><span class="k">股數</span><span class="v mono" id="hdShares">—</span></div>
+              <div class="row"><span class="k">均價(含費用)</span><span class="v mono" id="hdAvg">—</span></div>
+              <div class="row"><span class="k">未實現損益(平均成本法)</span><span class="v mono" id="hdUnreal">—</span></div>
+              <div class="row"><span class="k">已實現損益(不含配息)</span><span class="v mono" id="hdReal">—</span></div>
+              <div class="row total"><span class="k">2026 年配息(實領)</span><span class="v mono" id="hdDiv">—</span></div>
+            </div>
+            <div class="section-label">調整</div>
+            <div class="card ledger">
+              <div class="row field-row"><span class="k">目前現價(手動)</span><input type="number" id="hdPrice" min="0.01" step="0.1" aria-label="目前現價"></div>
+              <div class="row field-row"><span class="k">加碼股數</span><input type="number" id="hdBuyShares" min="0" step="1" value="0" aria-label="加碼股數"></div>
+              <div class="row field-row"><span class="k">減碼股數</span><input type="number" id="hdSellShares" min="0" step="1" value="0" aria-label="減碼股數"></div>
+              <div class="btn-row" style="padding:8px 0 4px"><button class="btn primary" id="hdApply">套用調整</button></div>
+            </div>
+            <p class="caption" id="hdMsg">現價變更即時重算;加碼以現價買進(含手續費),減碼以現價賣出(含手續費與證交稅)。</p>
+            <div class="section-label">本檔交易紀錄(含手續費與證交稅)</div>
+            <div class="card ledger" id="hdTxns"></div>
           </div>
         </section>
 
@@ -1311,13 +1350,32 @@ footer.demo-foot{
     var un = E.unrealizedPnL(snap.holdings, LEDGER_PRICES);
     var div = E.dividendSummary(allTxns(), 2026);
     document.getElementById("lgValue").textContent = fmtNT(value);
-    var hold = "";
+    var entries = [];
     snap.holdings.forEach(function(h){
       if (h.shares <= 0) return;
-      hold += '<div class="row"><span class="k">' + h.symbol + " × " + h.shares.toLocaleString("en-US") + " 股 · 均價 " + h.avgCost.toFixed(1) + '</span><span class="v mono">' + fmtSigned(un.bySymbol.get(h.symbol)) + "</span></div>";
+      entries.push({ sym: h.symbol, shares: h.shares, avgCost: h.avgCost, mv: h.shares * (LEDGER_PRICES[h.symbol] || 0), unreal: un.bySymbol.get(h.symbol) || 0 });
+    });
+    entries.sort(function(a, b){ return b.mv - a.mv; });
+    /* 配置橫條(dataviz:類別色=單色綠明度階固定順序,CVD ΔE 28.9 PASS;低彩度以下方列表籤補救) */
+    var CAT = ["var(--a1)", "var(--c90)", "var(--a2)", "var(--rule)"];
+    var bar = "", bx = 2, W = 336, GAP = 2;
+    entries.forEach(function(en, i){
+      var w = value > 0 ? Math.max(3, (en.mv / value) * (W - GAP * (entries.length - 1))) : 0;
+      bar += '<rect x="' + bx.toFixed(1) + '" y="10" width="' + w.toFixed(1) + '" height="20" rx="4" fill="' + CAT[Math.min(i, CAT.length - 1)] + '"><title>' + en.sym + " · " + (value > 0 ? Math.round((en.mv / value) * 100) : 0) + "%</title></rect>";
+      bx += w + GAP;
+    });
+    var barEl = document.getElementById("lgAllocBar");
+    if (barEl) barEl.innerHTML = bar;
+    var hold = "";
+    entries.forEach(function(en, i){
+      var pct = value > 0 ? Math.round((en.mv / value) * 100) : 0;
+      hold += '<button class="row holding-row" data-sym="' + en.sym + '"><span class="k"><i class="sw" style="background:' + CAT[Math.min(i, CAT.length - 1)] + '"></i>' + en.sym + " · " + pct + "% · " + fmtNT(en.mv) + '</span><span class="v mono">' + fmtSigned(en.unreal) + " →</span></button>";
     });
     hold += '<div class="row total"><span class="k">未實現損益合計</span><span class="v mono">' + fmtSigned(un.total) + "</span></div>";
     document.getElementById("lgHoldings").innerHTML = hold;
+    document.getElementById("lgHoldings").querySelectorAll(".holding-row").forEach(function(b){
+      b.addEventListener("click", function(){ openHolding(b.getAttribute("data-sym")); });
+    });
     var flows = allTxns().map(function(t){ return { date: t.date, amount: E.transactionCashFlow(t, cfg) }; });
     flows.push({ date: "2026-07-20", amount: value });
     var rate = E.xirr(flows);
@@ -1327,12 +1385,6 @@ footer.demo-foot{
     document.getElementById("lgRealized").textContent = fmtSigned(snap.realized.total);
     document.getElementById("lgDivTotal").textContent = fmtNT(div.total);
     document.getElementById("lgDivTop").textContent = div.top ? div.top.symbol + " · " + fmtNT(div.top.amount) : "—";
-    var tx = "";
-    allTxns().slice(-5).reverse().forEach(function(t){
-      var label = t.date + " " + t.symbol + " " + (t.type === "buy" ? "買進 " + t.shares.toLocaleString("en-US") + " 股" : t.type === "sell" ? "賣出 " + t.shares.toLocaleString("en-US") + " 股" : "配息");
-      tx += '<div class="row"><span class="k">' + label + '</span><span class="v mono">' + fmtSigned(E.transactionCashFlow(t, cfg)) + "</span></div>";
-    });
-    document.getElementById("lgTxns").innerHTML = tx;
   }
   renderLedger();
 
@@ -1463,6 +1515,79 @@ footer.demo-foot{
     html += '<div class="row total"><span class="k">待確認入帳(可編輯)</span><span class="v mono">+' + fmtNT(total) + "</span></div>";
     el.innerHTML = html;
   }
+
+  /* 持股明細(點列查看與調整;賣超由引擎驗證) -------------------------------- */
+  var currentHolding = null;
+  function openHolding(sym){
+    currentHolding = sym;
+    document.getElementById("hdBuyShares").value = 0;
+    document.getElementById("hdSellShares").value = 0;
+    document.getElementById("hdMsg").textContent = "現價變更即時重算;加碼以現價買進(含手續費),減碼以現價賣出(含手續費與證交稅)。";
+    renderHolding();
+    showById("s-holding");
+  }
+  function renderHolding(){
+    if (!E || !currentHolding) return;
+    var sym = currentHolding, cfg = { brokerFeeDiscount: 0.6 };
+    var meta = symbolMeta(sym) || {};
+    var snap = E.buildLedgerSnapshot(allTxns(), cfg);
+    var h = snap.holdings.get(sym);
+    var un = E.unrealizedPnL(snap.holdings, LEDGER_PRICES);
+    var value = E.portfolioValue(snap.holdings, LEDGER_PRICES);
+    var divSym = E.dividendSummary(allTxns(), 2026).bySymbol.get(sym) || 0;
+    var price = LEDGER_PRICES[sym] || 0;
+    var mv = h ? h.shares * price : 0;
+    document.getElementById("hdTitle").textContent = sym;
+    document.getElementById("hdName").textContent = meta.name || sym;
+    document.getElementById("hdClass").textContent = meta.assetClass === "stock" ? "個股 · 確定性試算" : "ETF · 機率試算";
+    document.getElementById("hdWarn").hidden = meta.warning !== "short-history";
+    document.getElementById("hdValue").textContent = fmtNT(mv);
+    document.getElementById("hdShare").textContent = "占投組 " + (value > 0 ? Math.round((mv / value) * 100) : 0) + "% · 現價為手動輸入,非即時行情。";
+    document.getElementById("hdShares").textContent = h ? h.shares.toLocaleString("en-US") + " 股" : "0 股";
+    document.getElementById("hdAvg").textContent = h ? h.avgCost.toFixed(1) : "—";
+    document.getElementById("hdUnreal").textContent = fmtSigned(un.bySymbol.get(sym) || 0);
+    document.getElementById("hdReal").textContent = fmtSigned(snap.realized.bySymbol.get(sym) || 0);
+    document.getElementById("hdDiv").textContent = fmtNT(divSym);
+    document.getElementById("hdPrice").value = price;
+    var tx = "";
+    allTxns().filter(function(t){ return t.symbol === sym; }).slice(-6).reverse().forEach(function(t){
+      var label = t.date + " " + (t.type === "buy" ? "買進 " + t.shares.toLocaleString("en-US") + " 股" : t.type === "sell" ? "賣出 " + t.shares.toLocaleString("en-US") + " 股" : "配息");
+      tx += '<div class="row"><span class="k">' + label + '</span><span class="v mono">' + fmtSigned(E.transactionCashFlow(t, cfg)) + "</span></div>";
+    });
+    document.getElementById("hdTxns").innerHTML = tx || '<div class="row"><span class="k">尚無交易</span><span class="v">—</span></div>';
+  }
+  (function initHoldingDetail(){
+    var apply = document.getElementById("hdApply");
+    if (!apply) return;
+    apply.addEventListener("click", function(){
+      if (!currentHolding || !E) return;
+      var sym = currentHolding, meta = symbolMeta(sym) || {};
+      var price = Number(document.getElementById("hdPrice").value);
+      var buy = Number(document.getElementById("hdBuyShares").value);
+      var sell = Number(document.getElementById("hdSellShares").value);
+      var msg = document.getElementById("hdMsg");
+      if (!(price > 0)) { msg.textContent = "現價需大於 0。"; return; }
+      LEDGER_PRICES[sym] = price;
+      var added = 0;
+      if (buy > 0) { USER_TXNS.push({ date: "2026-07-20", symbol: sym, assetClass: meta.assetClass || "etf", type: "buy", shares: buy, price: price }); added++; }
+      if (sell > 0) { USER_TXNS.push({ date: "2026-07-20", symbol: sym, assetClass: meta.assetClass || "etf", type: "sell", shares: sell, price: price }); added++; }
+      try {
+        E.buildLedgerSnapshot(allTxns(), { brokerFeeDiscount: 0.6 }); /* 賣超防護:交由引擎驗證 */
+      } catch (err) {
+        while (added-- > 0) USER_TXNS.pop();
+        msg.textContent = "調整未套用:" + err.message;
+        return;
+      }
+      msg.textContent = "已套用。加碼含手續費、減碼含手續費與證交稅,損益已即時更新。";
+      document.getElementById("hdBuyShares").value = 0;
+      document.getElementById("hdSellShares").value = 0;
+      renderLedger();
+      renderAutoDiv();
+      renderAssets();
+      if (assetFromLedger) renderAll();
+      renderHolding();
+    });
+  })();
 
   /* 自導覽模式(?tour=1:三幕腳本,給不在場的觀眾) --------------------------- */
   var TOUR = [

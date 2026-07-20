@@ -71,6 +71,16 @@ document.getElementById("f").addEventListener("load", function(){
     var avAfter = doc.getElementById("assetVal").textContent;
     results.push((avAfter !== avLedger ? "PASS" : "FAIL") + " 新增持股→試算起點重算");
     click(doc, "#assetManual");
+    /* 持股明細:配置列點入 → 調整 → 返回 */
+    click(doc, '.tabbar [data-tab="ledger"]');
+    click(doc, '#lgHoldings .holding-row');        assertScreen(doc, "s-holding", "配置列→持股明細");
+    var hv0 = doc.getElementById("hdValue").textContent;
+    doc.getElementById("hdPrice").value = 999;
+    click(doc, "#hdApply");
+    results.push((doc.getElementById("hdValue").textContent !== hv0 ? "PASS" : "FAIL") + " 明細調整現價→市值重算");
+    doc.getElementById("hdPrice").value = 132;
+    click(doc, "#hdApply"); /* 還原現價 */
+    click(doc, '#s-holding [data-go="s-ledger"]'); assertScreen(doc, "s-ledger", "明細→返回帳本");
     var pass = results.filter(function(r){ return r.indexOf("FAIL") === 0; }).length === 0;
     document.getElementById("out").textContent =
       "NAVTEST " + (pass ? "ALL-PASS" : "HAS-FAIL") + "\n" + results.join("\n");
