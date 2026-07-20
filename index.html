@@ -103,8 +103,10 @@ nav.screens button[aria-current="true"] .no{color:var(--a1)}
 @media (max-width:820px){
   .layout{flex-direction:column}
   nav.screens{position:static;flex:none;width:100%}
-  nav.screens ol{display:flex;overflow-x:auto;gap:4px;padding-bottom:8px}
-  nav.screens button{white-space:nowrap;min-height:40px}
+  /* 換行顯示全部項目:iOS 無捲軸提示,橫向捲動看起來像被切掉 */
+  nav.screens ol{display:flex;flex-wrap:wrap;gap:4px 2px;padding-bottom:8px}
+  nav.screens button{white-space:nowrap;min-height:40px;border:1px solid var(--rule);border-radius:999px;padding:0 12px}
+  nav.screens button[aria-current="true"]{background:var(--surf)}
   nav.screens .no{display:none}
 }
 
