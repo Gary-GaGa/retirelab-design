@@ -373,7 +373,7 @@ footer.demo-foot{
               <div class="row"><span class="k">勞保老年給付(估)</span><span class="v">NT$ 18,000<small>/月</small></span></div>
               <div class="row"><span class="k">勞退新制月退(估)</span><span class="v">NT$ 9,500<small>/月</small></span></div>
               <div class="row"><span class="k">不確定?</span><a class="link" href="https://www.bli.gov.tw/" target="_blank" rel="noopener">勞動部勞保局試算 ↗</a></div>
-              <div class="row total"><span class="k">自備缺口</span><span class="v">NT$ 12,500<small>/月</small></span></div>
+              <div class="row total"><span class="k">自備缺口</span><span class="v">NT$ 50,000<small>/月</small></span></div>
             </div>
             <div>
               <div class="section-label">提領率(SWR)</div>
@@ -396,15 +396,15 @@ footer.demo-foot{
           <div class="body">
             <div class="hero">
               <p class="lead">缺口換算後,你需要準備</p>
-              <div class="figure mono">NT$ 375<span class="unit">萬</span></div>
-              <p class="caption">= 每月缺口 12,500 元 ÷ 提領率 4% × 12 個月</p>
+              <div class="figure mono">NT$ 1,500<span class="unit">萬</span></div>
+              <p class="caption">= 每月缺口 50,000 元 ÷ 提領率 4% × 12 個月</p>
             </div>
             <div class="card ledger">
-              <div class="row"><span class="k">退休後月支出(估)</span><span class="v">NT$ 40,000</span></div>
+              <div class="row"><span class="k">退休後月支出(估)</span><span class="v">NT$ 77,500</span></div>
               <div class="row"><span class="k">勞保 + 勞退 覆蓋</span><span class="v">NT$ 27,500</span></div>
-              <div class="row"><span class="k">自備缺口</span><span class="v">NT$ 12,500<small>/月</small></span></div>
+              <div class="row"><span class="k">自備缺口</span><span class="v">NT$ 50,000<small>/月</small></span></div>
               <div class="row"><span class="k">提領率</span><span class="v">4.0%</span></div>
-              <div class="row total"><span class="k">目標資產</span><span class="v">NT$ 3,750,000</span></div>
+              <div class="row total"><span class="k">目標資產</span><span class="v">NT$ 15,000,000</span></div>
             </div>
             <p class="caption">月支出可依你目前的生活水準調整;之後隨時能在「設定」修改。</p>
             <div class="btn-row"><button class="btn primary" data-go="s-invest">下一步:投入計畫</button></div>
@@ -558,7 +558,7 @@ footer.demo-foot{
               </div>
             </div>
 
-            <p class="caption">資料來源:台股 23 年歷史樣本 · 樣本偏向權值股集中 · P10–P90 為歷史區間,非未來機率保證。</p>
+            <p class="caption">資料來源:合成示範資料(23 年月報酬樣本,Q2 前非真實行情)· 以實質報酬試算(示範通膨假設 2%/年)· 樣本偏向權值股集中 · P10–P90 為歷史區間,非未來機率保證。</p>
           </div>
         </section>
 
@@ -572,7 +572,7 @@ footer.demo-foot{
           <div class="body">
             <div class="hero">
               <p class="lead">若年報酬固定 6%,你會在</p>
-              <div class="figure mono">60<span class="unit">歲</span><span class="verb">達標</span></div>
+              <div class="figure mono" id="stockHero">60<span class="unit">歲</span><span class="verb">達標</span></div>
               <p class="caption">單一假設的算術結果 — 不是預測,也沒有機率。</p>
             </div>
 
@@ -596,9 +596,9 @@ footer.demo-foot{
             </div>
 
             <div class="card ledger">
-              <div class="row"><span class="k">報酬假設</span><span class="v">6.0%<small>/年,固定</small></span></div>
-              <div class="row"><span class="k">每月投入</span><span class="v">NT$ 15,000</span></div>
-              <div class="row total"><span class="k">達標年齡</span><span class="v">60 歲</span></div>
+              <div class="row"><span class="k">報酬假設</span><span class="v">6.0%<small>/年,固定(實質 ≈3.9%,通膨 2%)</small></span></div>
+              <div class="row"><span class="k">每月投入</span><span class="v" id="stockMonthly">NT$ 15,000</span></div>
+              <div class="row total"><span class="k">達標年齡</span><span class="v" id="stockAge">60 歲</span></div>
             </div>
 
             <div class="risk-block">
@@ -618,13 +618,13 @@ footer.demo-foot{
           <div class="body">
             <div class="hero">
               <p class="lead">以目前的計畫,到</p>
-              <div class="figure mono">65<span class="unit">歲</span></div>
-              <p class="lead">仍差 <strong class="mono">NT$ 92 萬</strong> 才能達標。</p>
+              <div class="figure mono" id="failAge">60<span class="unit">歲</span></div>
+              <p class="lead">仍差 <strong class="mono" id="failGap">NT$ 633 萬</strong> 才能達標。</p>
             </div>
             <div class="card chart-card">
               <svg viewBox="0 0 340 120" role="img" aria-label="資產線區間未達目標線">
                 <path d="M12 26 H328" stroke="var(--warn)" stroke-width="1.5" stroke-dasharray="5 4"/>
-                <text x="14" y="20" font-family="var(--sans)" font-size="10" fill="var(--ink-soft)">目標 NT$ 375 萬</text>
+                <text x="14" y="20" font-family="var(--sans)" font-size="10" fill="var(--ink-soft)">目標 NT$ 1,500 萬</text>
                 <path d="M150 30 V112" stroke="var(--rule)" stroke-width="1" stroke-dasharray="3 4"/>
                 <path d="M150 86 C210 80 265 66 322 50 L322 100 C265 92 210 88 150 86 Z" fill="var(--band)"/>
                 <path d="M150 86 C210 78 265 68 322 58" fill="none" stroke="var(--a1)" stroke-width="2.5"/>
@@ -635,9 +635,9 @@ footer.demo-foot{
             </div>
             <div class="section-label">拉近缺口的三條路</div>
             <div class="card ledger">
-              <div class="row"><span class="k">每月多投入 6,000</span><span class="v">63 歲<small>達標</small></span></div>
-              <div class="row"><span class="k">延後退休 3 年</span><span class="v">68 歲<small>達標</small></span></div>
-              <div class="row"><span class="k">月支出降 5,000</span><span class="v">64 歲<small>達標</small></span></div>
+              <div class="row"><span class="k">每月多投入 6,000</span><span class="v" id="failR1">59 歲<small>達標</small></span></div>
+              <div class="row"><span class="k" id="failR2Label">延後退休 6 年</span><span class="v" id="failR2">65 歲<small>達標</small></span></div>
+              <div class="row"><span class="k">月支出降 5,000</span><span class="v" id="failR3">59 歲<small>達標</small></span></div>
             </div>
             <div class="btn-row"><button class="btn primary" data-go="s-invest">調整計畫</button></div>
           </div>
@@ -653,7 +653,7 @@ footer.demo-foot{
           <div class="body">
             <div class="hero">
               <p class="lead">目前進度</p>
-              <div class="figure mono" style="font-size:44px">NT$ 1,080,000</div>
+              <div class="figure mono" style="font-size:44px">NT$ 1,400,000</div>
               <p class="caption">落在 P50 軌跡上下 3% 內 — 照計畫走。</p>
             </div>
             <div class="card chart-card">
@@ -785,10 +785,36 @@ footer.demo-foot{
   </footer>
 </div>
 
+<script src="engine.js"></script>
 <script>
 (function(){
   "use strict";
   var reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ── 真引擎接線:RetireLabEngine(@retirelab/engine demo bundle,engine.js)──
+     全部本地運算;fixtures 合成資料(Rule 7);實質報酬 = 名目 ÷ 通膨(示範假設 2%/年)。
+     示範情境:目標 1,500 萬(今日購買力)、既有資產 80 萬、希望 60 歲前退休。 */
+  var E = window.RetireLabEngine || null;
+  var DEMO = { target: 15000000, current: 800000, sims: 1000, seed: 42, inflation: 0.02, wishAge: 60, stockReturn: 0.06 };
+  var SIM = null, realReturns = null, geoMonthly = 0;
+  if (E) {
+    var infM = E.monthlyRate(DEMO.inflation);
+    var nom = E.fixtures.series0050.adjustedReturns;
+    realReturns = new Float64Array(nom.length);
+    var logSum = 0;
+    for (var ri = 0; ri < nom.length; ri++) {
+      realReturns[ri] = (1 + nom[ri]) / (1 + infM) - 1;
+      logSum += Math.log(1 + realReturns[ri]);
+    }
+    geoMonthly = Math.exp(logSum / nom.length) - 1;
+  }
+  function currentAge(){ var el = document.getElementById("ageRange"); return el ? Number(el.value) : 35; }
+  function planMonthly(){ var el = document.getElementById("advRange"); return el ? Number(el.value) : 15000; }
+  function mcRun(monthly, target){
+    return E.runMonteCarlo({ targetAmount: target == null ? DEMO.target : target, currentAssets: DEMO.current, netMonthlyContribution: monthly, monthlyReturns: realReturns, simulations: DEMO.sims, seed: DEMO.seed });
+  }
+  function mAge(months){ return Number.isFinite(months) ? currentAge() + months / 12 : Infinity; }
+  function fmtAge(a){ return Number.isFinite(a) ? String(Math.round(a)) : "80+"; }
 
   /* demo nav ------------------------------------------------------------ */
   var screens = Array.prototype.slice.call(document.querySelectorAll(".screen"));
@@ -855,7 +881,7 @@ footer.demo-foot{
   document.getElementById("phone").addEventListener("click", function(e){
     if (!appMode) return;
     var go = e.target.closest("[data-go]");
-    if (go) { showById(go.dataset.go); return; }
+    if (go) { if (go.dataset.go === "s-fail") renderFail(); showById(go.dataset.go); return; }
     if (e.target.closest("#startCalc")) {
       var stock = document.getElementById("pickStock").getAttribute("aria-pressed") === "true";
       showById(stock ? "s-result-stock" : "s-result-etf");
@@ -901,24 +927,21 @@ footer.demo-foot{
     });
   });
 
-  /* 投入 slider ---------------------------------------------------------- */
+  /* 投入 slider(與進階 slider 同步為單一計畫值)---------------------------- */
   var investRange = document.getElementById("investRange");
   var investOut = document.getElementById("investOut");
   investRange.addEventListener("input", function(){
     investOut.textContent = "NT$ " + Number(investRange.value).toLocaleString("en-US");
+    advRange.value = investRange.value;
+    renderResults();
   });
 
   /* 目前年齡 slider(F-01 v0.7:18–80,預設 35)----------------------------- */
   var ageRange = document.getElementById("ageRange");
   var ageOut = document.getElementById("ageOut");
-  var ageDelta = 0; /* 相對預設 35 的差量;結果頁達標年齡 = 基準 + 差量 */
   ageRange.addEventListener("input", function(){
     ageOut.textContent = ageRange.value + " 歲";
-    ageDelta = Number(ageRange.value) - 35;
-    document.querySelectorAll('#s-result-etf .pcard .age[data-base]').forEach(function(el){
-      el.innerHTML = (Number(el.getAttribute("data-base")) + ageDelta) + '<small> 歲</small>';
-    });
-    etfHero.innerHTML = heroAge(Number(advRange.value)) + '<span class="unit">歲</span><span class="verb">退休</span>';
+    renderResults();
   });
 
   /* 結果 ETF:簡單/進階 --------------------------------------------------- */
@@ -950,8 +973,7 @@ footer.demo-foot{
   var advOut = document.getElementById("advOut");
   var simState = document.getElementById("simState");
   var etfHero = document.getElementById("etfHero");
-  function estAge(v){ return Math.max(45, Math.round(66 - (v / 3000))); }
-  function heroAge(v){ return Math.min(99, estAge(v) + ageDelta); }
+  function estAge(v){ return Math.max(45, Math.round(66 - (v / 3000))); } /* fallback(無引擎時)*/
   /* §6: slider updates the fan live — the chart itself, not just the numeral */
   function fanC(y){
     return "C210 " + (92 + (y - 92) * 0.14).toFixed(1) + " 265 " + (92 + (y - 92) * 0.64).toFixed(1) + " 322 " + y.toFixed(1);
@@ -959,9 +981,11 @@ footer.demo-foot{
   function fanCRev(y){
     return "C265 " + (92 + (y - 92) * 0.64).toFixed(1) + " 210 " + (92 + (y - 92) * 0.14).toFixed(1) + " 150 92";
   }
-  function updateFan(v){
-    var t = (v - 5000) / 45000;
-    var y90 = Math.max(22, 42 - 36 * t), y50 = 82 - 45 * t, y10 = 132 - 45 * t;
+  function yForAge(a){ /* 達標年齡 45–80 → 圖表 y 22–132(愈早達標線位愈高)*/
+    var t = (Math.min(80, Math.max(45, a)) - 45) / 35;
+    return 22 + t * 110;
+  }
+  function setFanPaths(y90, y50, y10){
     var band = document.getElementById("fanBand");
     if (!band) return;
     band.setAttribute("d", "M150 92 " + fanC(y90) + " L322 " + y10.toFixed(1) + " " + fanCRev(y10) + " Z");
@@ -972,22 +996,78 @@ footer.demo-foot{
     document.getElementById("labP50").setAttribute("y", (y50 - 2).toFixed(1));
     document.getElementById("labP10").setAttribute("y", (y10 + 12).toFixed(1));
   }
-  advRange.addEventListener("input", function(){
-    var v = Number(advRange.value);
+  function updateFan(v){ /* fallback:以投入金額線性外推 */
+    var t = (v - 5000) / 45000;
+    setFanPaths(Math.max(22, 42 - 36 * t), 82 - 45 * t, 132 - 45 * t);
+  }
+  function renderResults(){
+    var v = planMonthly();
     advOut.textContent = "NT$ " + v.toLocaleString("en-US");
+    if (!E) {
+      etfHero.innerHTML = estAge(v) + '<span class="unit">歲</span><span class="verb">退休</span>';
+      updateFan(v);
+      return;
+    }
+    SIM = mcRun(v);
+    var a10 = mAge(SIM.p10Months), a50 = mAge(SIM.p50Months), a90 = mAge(SIM.p90Months);
+    etfHero.innerHTML = fmtAge(a50) + '<span class="unit">歲</span><span class="verb">退休</span>';
+    var cards = document.querySelectorAll("#s-result-etf .pcard .age");
+    if (cards.length === 3) {
+      cards[0].innerHTML = fmtAge(a10) + "<small> 歲</small>";
+      cards[1].innerHTML = fmtAge(a50) + "<small> 歲</small>";
+      cards[2].innerHTML = fmtAge(a90) + "<small> 歲</small>";
+    }
+    setFanPaths(yForAge(a10), yForAge(a50), yForAge(a90));
+    renderStock();
+  }
+  function renderStock(){
+    if (!E) return;
+    var months = E.solveMonths({ targetAmount: DEMO.target, currentAssets: DEMO.current, monthlyContribution: planMonthly(), annualReturn: DEMO.stockReturn, annualInflation: DEMO.inflation, maxMonths: 720 });
+    var ageTxt = months == null ? "80+" : fmtAge(currentAge() + months / 12);
+    document.getElementById("stockHero").innerHTML = ageTxt + '<span class="unit">歲</span><span class="verb">達標</span>';
+    document.getElementById("stockAge").textContent = ageTxt + " 歲";
+    document.getElementById("stockMonthly").textContent = "NT$ " + planMonthly().toLocaleString("en-US");
+  }
+  function renderFail(){
+    if (!E) return;
+    if (!SIM) SIM = mcRun(planMonthly());
+    var m = planMonthly();
+    var wish = Math.max(DEMO.wishAge, currentAge() + 1);
+    var wishMonths = Math.round((wish - currentAge()) * 12);
+    var realAnnual = Math.pow(1 + geoMonthly, 12) - 1; /* 合成樣本幾何平均(實質)*/
+    var fv = E.futureValue({ targetAmount: DEMO.target, currentAssets: DEMO.current, monthlyContribution: m, annualReturn: realAnnual }, wishMonths);
+    var gapWan = Math.max(0, Math.round((DEMO.target - fv) / 10000));
+    document.getElementById("failAge").innerHTML = wish + '<span class="unit">歲</span>';
+    document.getElementById("failGap").textContent = "NT$ " + gapWan.toLocaleString("en-US") + " 萬";
+    var a1 = mAge(mcRun(m + 6000).p50Months);
+    var aBase = mAge(SIM.p50Months);
+    var delay = Number.isFinite(aBase) ? Math.max(1, Math.ceil(aBase - wish)) : null;
+    var a3 = mAge(mcRun(m + 5000, DEMO.target - 1500000).p50Months); /* 月支出降 5,000:目標 −150 萬(5,000×12÷4%)且可投入 +5,000 */
+    document.getElementById("failR1").innerHTML = fmtAge(a1) + " 歲<small>達標</small>";
+    document.getElementById("failR2Label").textContent = delay == null ? "延後退休" : "延後退休 " + delay + " 年";
+    document.getElementById("failR2").innerHTML = fmtAge(aBase) + " 歲<small>達標</small>";
+    document.getElementById("failR3").innerHTML = fmtAge(a3) + " 歲<small>達標</small>";
+  }
+  function isFail(){
+    if (!E || !SIM) return Number(advRange.value) <= 7000; /* fallback */
+    return mAge(SIM.p50Months) > Math.max(DEMO.wishAge, currentAge() + 1);
+  }
+  advRange.addEventListener("input", function(){
     simState.textContent = "快速估算中⋯(放開後跑完整模擬)";
     simState.classList.add("live");
     document.getElementById("failLink").hidden = true; /* 拖曳中不顯示,放開後再判斷 */
-    etfHero.innerHTML = heroAge(v) + '<span class="unit">歲</span><span class="verb">退休</span>';
-    updateFan(v);
+    investRange.value = advRange.value;
+    investOut.textContent = "NT$ " + Number(investRange.value).toLocaleString("en-US");
+    renderResults();
   });
   advRange.addEventListener("change", function(){
     simState.textContent = "模擬結果 · 1,000 次情境";
     simState.classList.remove("live");
     /* WCAG 3.2.2:不自動跳頁 — 低投入時就地顯示明確的導航動作 */
     var failLink = document.getElementById("failLink");
-    failLink.hidden = !(appMode && Number(advRange.value) <= 7000);
+    failLink.hidden = !(appMode && isFail());
   });
+  renderResults(); /* 初始渲染:預設值即為真引擎輸出 */
 
   /* 進階:30 秒導覽 -------------------------------------------------------- */
   var guide = document.getElementById("fanGuide");
