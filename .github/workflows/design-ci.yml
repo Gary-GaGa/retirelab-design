@@ -1,0 +1,26 @@
+# 設計線 sensor 的 commit/CI tier:token drift + 導覽回歸。
+# (本機另有 Claude Code PostToolUse hook 即時稽核;此處擋 session 外提交。)
+name: design-ci
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Token drift audit
+        run: python3 ops/design/scripts/audit_tokens.py --spec design/DESIGN_SPEC.md --src .
+      - name: navtest(headless chrome 導覽回歸)
+        run: |
+          python3 -m http.server 8080 &
+          sleep 1
+          google-chrome --headless --disable-gpu --no-sandbox --virtual-time-budget=9000 \
+            --dump-dom http://localhost:8080/ops/design/tests/navtest.html > navtest-out.html
+          if ! grep -q "NAVTEST ALL-PASS" navtest-out.html; then
+            grep -oE "(PASS|FAIL)[^<]*" navtest-out.html || true
+            exit 1
+          fi
+          echo "NAVTEST ALL-PASS"
