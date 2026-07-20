@@ -7,6 +7,7 @@ Live Demo:https://gary-gaga.github.io/retirelab-design/
 
 | 匯出日期 | 檔案 | 對應 PRD 版本 | 涵蓋畫面 / 備註 |
 |---|---|---|---|
+| 2026-07-20 | index.html + engine.js(再審視修復) | PRD v0.8 | 雙鏡片第二輪修復:①追蹤頁接真 — 進度=帳本市值(與帳本同源,殺掉最後假畫面),投入列表/累積投入由交易紀錄推導;②配置圖顏色改跟隨標的(metadata 固定,dataviz「color follows entity」);③比較/提領期接入 App 流程(結果頁連結+返回鍵);④tour 更新為 12 步(含比較/持股明細);⑤提領期自實際 P50 達標年齡起算;⑥每年調升滑桿接真(engine annualContributionGrowth,預設 0% 保 58 歲 signature,拉 10% 可見提早 6 年);⑦新增持股與加碼統一計費口徑。navtest 32 項 ALL-PASS |
 | 2026-07-20 | index.html(帳本精簡+持股明細) | PRD v0.8 F-12 | 共 17 畫面。帳本改版:持股列表 → 市值占比橫條圖(單色綠明度階固定順序,dataviz 驗證 CVD ΔE 28.9 PASS;低彩度以列表籤補救)+ 可點配置列;新增第 17 畫面「持股明細」:單檔市值/均價/未實現/已實現/年配息 + 調整區(改現價/加碼/減碼,賣超由引擎驗證擋下)+ 本檔交易紀錄;帳本頁移除全域交易列表(移入明細)。navtest 27 項 ALL-PASS |
 | 2026-07-20 | index.html(持股輸入→試算起點) | PRD v0.8 F-12×F-01 | 帳本頁新增「新增持股」表單(標的 chips 由 fixtures metadata 動態生成含 00940 短史警示,Rule 2;股數/含費用成本/手動現價);投入頁「已累積資產」可切換手動示範值/帳本市值(portfolioValue),切換後全下游試算連動。navtest 增 2 項斷言(共 24 項) |
 | 2026-07-20 | index.html + engine.js(Demo 完整化) | PRD v0.8 | 共 16 畫面。①MVP 補完:缺口引導三滑桿接 `gap.ts`(目標動態化,全下游連動)、稅費接 `tax.ts`(級距 chips/含不含切換真算,feeNote 動態:12% 級距實測差 +0.4 年)、新增「方法揭露」頁;②v1.1 前移:「標的比較」頁(0050 vs 0056 雙 MC,P50 差 2.4 年)、帳本「配息自動生成」示意(mock 除息事件 × 真持股);③v2.0 概念驗證:「提領期」頁接 engine `decumulation`(§6.8);④`?tour=1` 自導覽(10 步三幕腳本)。navtest 增 7 項斷言 |

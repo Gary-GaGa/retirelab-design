@@ -453,8 +453,8 @@ footer.demo-foot{
                 <input type="range" min="5000" max="50000" step="1000" value="15000" id="investRange" aria-label="每月投入金額">
               </div>
               <div class="slider-row">
-                <div class="lab"><span>每年調升</span><output class="mono">3%</output></div>
-                <input type="range" min="0" max="10" step="1" value="3" aria-label="每年調升比例">
+                <div class="lab"><span>每年調升</span><output class="mono" id="raiseOut">0%</output></div>
+                <input type="range" min="0" max="10" step="1" value="0" id="raiseRange" aria-label="每年調升比例">
               </div>
             </div>
             <p class="caption">投入金額之後可以隨薪資調整;先抓一個做得到的數字。</p>
@@ -583,7 +583,7 @@ footer.demo-foot{
               </div>
             </div>
 
-            <p class="caption">資料來源:合成示範資料 · 實質報酬試算(通膨 2%/年)· P10–P90 為歷史區間,非未來機率保證。 <button class="link" data-go="s-method" style="font-size:inherit">方法與資料來源 →</button></p>
+            <p class="caption">資料來源:合成示範資料 · 實質報酬試算(通膨 2%/年)· P10–P90 為歷史區間,非未來機率保證。 <button class="link" data-go="s-method" style="font-size:inherit">方法與資料來源 →</button> <button class="link" data-go="s-compare" style="font-size:inherit">比較其他標的 →</button></p>
           </div>
         </section>
 
@@ -678,8 +678,8 @@ footer.demo-foot{
           <div class="body">
             <div class="hero">
               <p class="lead">目前進度</p>
-              <div class="figure mono" style="font-size:44px">NT$ 1,400,000</div>
-              <p class="caption">落在 P50 軌跡上下 3% 內 — 照計畫走。</p>
+              <div class="figure mono" style="font-size:44px" id="trackVal">NT$ —</div>
+              <p class="caption" id="trackNote">進度來自帳本市值(F-12 進度整合)。</p>
             </div>
             <div class="card chart-card">
               <svg viewBox="0 0 340 120" role="img" aria-label="實際累積對照試算軌跡">
@@ -691,13 +691,8 @@ footer.demo-foot{
                 <text x="150" y="116" text-anchor="middle" font-family="var(--sans)" font-size="10" fill="var(--ink-soft)">今天</text>
               </svg>
             </div>
-            <div class="card ledger">
-              <div class="row"><span class="k">2026/07 投入</span><span class="v">NT$ 15,000</span></div>
-              <div class="row"><span class="k">2026/06 投入</span><span class="v">NT$ 15,000</span></div>
-              <div class="row"><span class="k">2026/05 投入</span><span class="v">NT$ 15,000</span></div>
-              <div class="row total"><span class="k">累積投入</span><span class="v">NT$ 1,080,000</span></div>
-            </div>
-            <p class="caption">每月記一筆,像存摺一樣 — 印出來的才算數。</p>
+            <div class="card ledger" id="trackRows"></div>
+            <p class="caption">每筆來自帳本交易紀錄,像存摺一樣 — 印出來的才算數。</p>
           </div>
         </section>
 
@@ -740,11 +735,11 @@ footer.demo-foot{
               </div>
               <p class="caption" id="holdWarn" hidden>上市未滿 10 年,歷史樣本不足,模擬可信度低。</p>
               <div class="row field-row"><span class="k">股數</span><input type="number" id="holdShares" min="1" step="1" value="1000" aria-label="股數"></div>
-              <div class="row field-row"><span class="k">每股成本(含費用)</span><input type="number" id="holdCost" min="0.01" step="0.1" value="120" aria-label="每股成本"></div>
+              <div class="row field-row"><span class="k">每股買進均價</span><input type="number" id="holdCost" min="0.01" step="0.1" value="120" aria-label="每股買進均價"></div>
               <div class="row field-row"><span class="k">目前現價(手動)</span><input type="number" id="holdPrice" min="0.01" step="0.1" value="132" aria-label="目前現價"></div>
               <div class="btn-row" style="padding:8px 0 4px"><button class="btn primary" id="holdAdd">加入帳本</button></div>
             </div>
-            <p class="caption">現價為手動輸入,非即時行情(Q2 前無行情源);成本以含費用計,加入即以平均成本法併入持股,並可作為試算起點(投入頁切換)。單筆交易明細移至各持股頁。</p>
+            <p class="caption">現價為手動輸入,非即時行情(Q2 前無行情源);以買進均價入帳,手續費由引擎另計(與明細頁加碼同口徑),平均成本法併入持股,並可作為試算起點(投入頁切換)。單筆交易明細移至各持股頁。</p>
             <div class="section-label">配息自動生成(示意,F-17)</div>
             <div class="card ledger" id="lgAutoDiv"></div>
             <p class="caption">依持股 × 除息事件自動代入現金股利,可編輯後入帳;正式功能依賴 Q2 資料授權之公司行動事件庫,本區為合成事件示意。</p>
@@ -878,19 +873,20 @@ footer.demo-foot{
 
         <!-- 15 標的比較(F-13 前移驗證) ===================================== -->
         <section class="screen" id="s-compare" data-name="標的比較">
-          <div class="appbar"><span class="title">標的比較</span><span class="spacer"></span><span class="chip">ETF 型</span></div>
+          <div class="appbar"><button class="link" data-go="s-result-etf">← 試算</button><span class="title" style="margin-left:8px">標的比較</span><span class="spacer"></span><span class="chip">ETF 型</span></div>
           <div class="body">
             <p style="font-size:15px">相同投入、年齡與稅費假設下,兩檔 ETF 的達標時間對照。口徑相同,僅歷史樣本不同。</p>
             <div class="card ledger" id="cmpTable"></div>
             <p class="caption">同參數對照,非優劣排序;歷史樣本不代表未來,兩檔樣本期間長度不同(0050:276 月/0056:216 月)。殖利率假設一律 3%(示範),高股息型實際稅費 drag 會更高。</p>
             <div class="section-label">個股?</div>
             <p class="caption">個股僅提供確定性試算(單一假設),與 ETF 機率區間口徑不同,不納入本頁對照。</p>
+            <div class="btn-row"><button class="btn ghost" data-go="s-decum">查看提領期(概念)→</button></div>
           </div>
         </section>
 
         <!-- 16 提領期(F-22 概念驗證) ======================================= -->
         <section class="screen" id="s-decum" data-name="提領期(概念)">
-          <div class="appbar"><span class="title">提領期模擬</span><span class="spacer"></span><span class="chip">概念驗證</span></div>
+          <div class="appbar"><button class="link" data-go="s-result-etf">← 試算</button><span class="title" style="margin-left:8px">提領期模擬</span><span class="spacer"></span><span class="chip">概念驗證</span></div>
           <div class="body">
             <div class="hero">
               <p class="lead">退休後每月提領 <span class="mono" id="decumWOut">NT$ 50,000</span>,約一半的歷史情境能支應到</p>
@@ -926,9 +922,9 @@ footer.demo-foot{
               <div class="row"><span class="k">起始資產(承接累積期目標)</span><span class="v mono" id="decumAssets">—</span></div>
               <div class="row"><span class="k">保守(10% 情境更早用罄)</span><span class="v mono" id="decumP10">—</span></div>
               <div class="row"><span class="k">中位</span><span class="v mono" id="decumP50">—</span></div>
-              <div class="row total"><span class="k">樂觀(90% 情境在此之前)</span><span class="v mono" id="decumP90">—</span></div>
+              <div class="row total"><span class="k">樂觀(90% 情境在此之前用罄)</span><span class="v mono" id="decumP90">—</span></div>
             </div>
-            <p class="caption">v2.0 概念驗證(F-22):僅 ETF 類適用;歸零 = 資產用罄;100+ 表示 60 年模擬期內未用罄。自 60 歲退休起算。</p>
+            <p class="caption" id="decumStartNote">v2.0 概念驗證(F-22):僅 ETF 類適用;歸零 = 資產用罄;100+ 表示 60 年模擬期內未用罄。</p>
           </div>
         </section>
 
@@ -942,7 +938,7 @@ footer.demo-foot{
           </div>
           <div class="body">
             <div class="hero">
-              <p class="lead" id="hdName">元大台灣50(合成)</p>
+              <p class="lead"><i class="sw" id="hdSw"></i><span id="hdName">元大台灣50(合成)</span></p>
               <div class="figure mono" style="font-size:40px" id="hdValue">—</div>
               <p class="caption" id="hdShare">占投組 —% · 現價為手動輸入,非即時行情。</p>
             </div>
@@ -1008,6 +1004,7 @@ footer.demo-foot{
   }
   function currentAge(){ var el = document.getElementById("ageRange"); return el ? Number(el.value) : 35; }
   function planMonthly(){ var el = document.getElementById("advRange"); return el ? Number(el.value) : 15000; }
+  function raiseValue(){ var el = document.getElementById("raiseRange"); return el ? Number(el.value) / 100 : 0; } /* F-02 投入年調升(引擎支援) */
   function mcRun(monthly, target, series){
     var net = monthly, drag = 0;
     if (feeIncluded) {
@@ -1021,6 +1018,7 @@ footer.demo-foot{
       netMonthlyContribution: net,
       monthlyReturns: series || realReturns,
       monthlyDividendDrag: drag,
+      annualContributionGrowth: raiseValue(),
       simulations: DEMO.sims,
       seed: DEMO.seed,
     });
@@ -1195,6 +1193,13 @@ footer.demo-foot{
     renderResults();
   });
 
+  /* 每年調升 slider(F-02:接引擎 annualContributionGrowth)------------------ */
+  var raiseRange = document.getElementById("raiseRange");
+  raiseRange.addEventListener("input", function(){
+    document.getElementById("raiseOut").textContent = raiseRange.value + "%";
+    renderAll();
+  });
+
   /* 結果 ETF:簡單/進階 --------------------------------------------------- */
   var mS = document.getElementById("modeSimple"), mA = document.getElementById("modeAdv");
   var simple = document.getElementById("etfSimple"), adv = document.getElementById("etfAdv");
@@ -1356,12 +1361,11 @@ footer.demo-foot{
       entries.push({ sym: h.symbol, shares: h.shares, avgCost: h.avgCost, mv: h.shares * (LEDGER_PRICES[h.symbol] || 0), unreal: un.bySymbol.get(h.symbol) || 0 });
     });
     entries.sort(function(a, b){ return b.mv - a.mv; });
-    /* 配置橫條(dataviz:類別色=單色綠明度階固定順序,CVD ΔE 28.9 PASS;低彩度以下方列表籤補救) */
-    var CAT = ["var(--a1)", "var(--c90)", "var(--a2)", "var(--rule)"];
+    /* 配置橫條(dataviz:類別色=單色綠明度階;顏色跟隨標的(entity)非排名,依 metadata 固定;CVD ΔE 28.9 PASS,低彩度以下方列表籤補救) */
     var bar = "", bx = 2, W = 336, GAP = 2;
-    entries.forEach(function(en, i){
+    entries.forEach(function(en){
       var w = value > 0 ? Math.max(3, (en.mv / value) * (W - GAP * (entries.length - 1))) : 0;
-      bar += '<rect x="' + bx.toFixed(1) + '" y="10" width="' + w.toFixed(1) + '" height="20" rx="4" fill="' + CAT[Math.min(i, CAT.length - 1)] + '"><title>' + en.sym + " · " + (value > 0 ? Math.round((en.mv / value) * 100) : 0) + "%</title></rect>";
+      bar += '<rect x="' + bx.toFixed(1) + '" y="10" width="' + w.toFixed(1) + '" height="20" rx="4" fill="' + symColor(en.sym) + '"><title>' + en.sym + " · " + (value > 0 ? Math.round((en.mv / value) * 100) : 0) + "%</title></rect>";
       bx += w + GAP;
     });
     var barEl = document.getElementById("lgAllocBar");
@@ -1369,7 +1373,7 @@ footer.demo-foot{
     var hold = "";
     entries.forEach(function(en, i){
       var pct = value > 0 ? Math.round((en.mv / value) * 100) : 0;
-      hold += '<button class="row holding-row" data-sym="' + en.sym + '"><span class="k"><i class="sw" style="background:' + CAT[Math.min(i, CAT.length - 1)] + '"></i>' + en.sym + " · " + pct + "% · " + fmtNT(en.mv) + '</span><span class="v mono">' + fmtSigned(en.unreal) + " →</span></button>";
+      hold += '<button class="row holding-row" data-sym="' + en.sym + '"><span class="k"><i class="sw" style="background:' + symColor(en.sym) + '"></i>' + en.sym + " · " + pct + "% · " + fmtNT(en.mv) + '</span><span class="v mono">' + fmtSigned(en.unreal) + " →</span></button>";
     });
     hold += '<div class="row total"><span class="k">未實現損益合計</span><span class="v mono">' + fmtSigned(un.total) + "</span></div>";
     document.getElementById("lgHoldings").innerHTML = hold;
@@ -1479,7 +1483,10 @@ footer.demo-foot{
     var w = Number(el.value);
     var assets = currentTarget();
     var r = E.runDecumulation({ initialAssets: Math.max(1, assets), monthlyWithdrawal: w, monthlyReturns: realReturns, simulations: DEMO.sims, seed: DEMO.seed });
-    var retAge = Math.max(DEMO.wishAge, currentAge() + 1);
+    var achieved = SIM && Number.isFinite(SIM.p50Months) ? mAge(SIM.p50Months) : null;
+    var retAge = achieved != null ? Math.max(currentAge() + 1, achieved) : Math.max(DEMO.wishAge, currentAge() + 1);
+    var startNote = document.getElementById("decumStartNote");
+    if (startNote) startNote.textContent = "v2.0 概念驗證(F-22):僅 ETF 類適用;歸零 = 資產用罄;100+ 表示 60 年模擬期內未用罄。自 " + Math.round(retAge) + " 歲(P50 達標年齡)退休起算。";
     var dAge = function(mo){
       if (!Number.isFinite(mo)) return "100+";
       var a = retAge + mo / 12;
@@ -1539,6 +1546,7 @@ footer.demo-foot{
     var mv = h ? h.shares * price : 0;
     document.getElementById("hdTitle").textContent = sym;
     document.getElementById("hdName").textContent = meta.name || sym;
+    document.getElementById("hdSw").style.background = symColor(sym);
     document.getElementById("hdClass").textContent = meta.assetClass === "stock" ? "個股 · 確定性試算" : "ETF · 機率試算";
     document.getElementById("hdWarn").hidden = meta.warning !== "short-history";
     document.getElementById("hdValue").textContent = fmtNT(mv);
@@ -1584,6 +1592,7 @@ footer.demo-foot{
       renderLedger();
       renderAutoDiv();
       renderAssets();
+      renderTrack();
       if (assetFromLedger) renderAll();
       renderHolding();
     });
@@ -1599,8 +1608,10 @@ footer.demo-foot{
     { s: "s-target", t: "兩種標的,兩種誠實:ETF 給機率,個股只給單一假設。" },
     { s: "s-result-stock", t: "個股頁沒有機率語句 — 對單一公司,我們算不出誠實的機率。" },
     { s: "s-fail", t: "誠實的極致:做不到就說做不到,並給三條路,每條都重新試算過。" },
-    { s: "s-ledger", t: "留存主賭注:交易帳本 — 已實現/未實現損益、配息彙總、三數字誠實對照。" },
-    { s: "s-decum", t: "更遠的方向:從『幾歲退休』到『錢夠花到幾歲』— 提領期模擬概念驗證。" },
+    { s: "s-compare", t: "同參數下兩檔 ETF 的對照 — 口徑相同、非優劣排序,差異只來自歷史樣本。" },
+    { s: "s-ledger", t: "留存主賭注:交易帳本 — 配置圖依市值一眼看懂,點任一列進單檔明細。" },
+    { s: "s-holding", t: "單檔明細:市值、均價、已實現/未實現、年配息,可改現價與加減碼 — 賣超由引擎擋下。" },
+    { s: "s-decum", t: "更遠的方向:從『幾歲退休』到『錢夠花到幾歲』— 提領期自你的達標年齡起算。" },
   ];
   if (qs.get("tour") === "1") {
     var tourIdx = 0;
@@ -1626,6 +1637,15 @@ footer.demo-foot{
   function symbolMeta(sym){
     if (!E) return null;
     return E.fixtures.symbols.symbols.find(function(x){ return x.symbol === sym; }) || null;
+  }
+  var SYMBOL_COLOR = null;
+  function symColor(sym){ /* 顏色跟隨標的,依 metadata 固定順序(dataviz:color follows entity) */
+    if (!SYMBOL_COLOR) {
+      SYMBOL_COLOR = {};
+      var order = ["var(--a1)", "var(--c90)", "var(--a2)", "var(--rule)"];
+      if (E) E.fixtures.symbols.symbols.forEach(function(m, i){ SYMBOL_COLOR[m.symbol] = order[Math.min(i, order.length - 1)]; });
+    }
+    return SYMBOL_COLOR[sym] || "var(--rule)";
   }
   function selectedHoldSymbol(){
     var b = document.querySelector('#holdSymChips button[aria-pressed="true"]');
@@ -1674,12 +1694,13 @@ footer.demo-foot{
       var cost = Number(document.getElementById("holdCost").value);
       var price = Number(document.getElementById("holdPrice").value);
       if (!meta || !(shares > 0) || !(cost > 0) || !(price > 0)) return;
-      /* 成本輸入視為含費用之每股成本 → feeOverride:0 使平均成本 = 輸入值 */
-      USER_TXNS.push({ date: "2026-07-20", symbol: sym, assetClass: meta.assetClass, type: "buy", shares: shares, price: cost, feeOverride: 0 });
+      /* 買進均價入帳,手續費由引擎另計(與明細頁加碼同口徑) */
+      USER_TXNS.push({ date: "2026-07-20", symbol: sym, assetClass: meta.assetClass, type: "buy", shares: shares, price: cost });
       LEDGER_PRICES[sym] = price;
       renderLedger();
       renderAutoDiv();
       renderAssets();
+      renderTrack();
       if (assetFromLedger) renderAll();
     });
     var aM = document.getElementById("assetManual"), aL = document.getElementById("assetLedger");
@@ -1720,7 +1741,27 @@ footer.demo-foot{
   });
   var decumEl = document.getElementById("decumRange");
   if (decumEl) decumEl.addEventListener("input", function(){ decumTouched = true; renderDecum(); });
-  function renderAll(){ renderGap(); renderResults(); renderCompare(); renderDecum(); renderAssets(); }
+  /* 追蹤頁(F-12 進度整合:一律以帳本市值為進度) --------------------------- */
+  function renderTrack(){
+    var el = document.getElementById("trackVal");
+    if (!el || !E) return;
+    var cfg = { brokerFeeDiscount: 0.6 };
+    var snap = E.buildLedgerSnapshot(allTxns(), cfg);
+    var mv = E.portfolioValue(snap.holdings, LEDGER_PRICES);
+    var target = currentTarget();
+    var pct = target > 0 ? (mv / target * 100).toFixed(1) : "0";
+    el.textContent = fmtNT(mv);
+    document.getElementById("trackNote").textContent = "進度來自帳本市值(F-12 進度整合)— 已達目標 " + pct + "%。";
+    var invested = 0;
+    allTxns().forEach(function(t){ var cf = E.transactionCashFlow(t, cfg); if (cf < 0) invested += -cf; });
+    var rows = "";
+    allTxns().filter(function(t){ return t.type === "buy"; }).slice(-3).reverse().forEach(function(t){
+      rows += '<div class="row"><span class="k">' + t.date + " 買進 " + t.symbol + '</span><span class="v mono">' + fmtNT(t.shares * t.price) + "</span></div>";
+    });
+    rows += '<div class="row total"><span class="k">累積投入(含費用)</span><span class="v mono">' + fmtNT(invested) + "</span></div>";
+    document.getElementById("trackRows").innerHTML = rows;
+  }
+  function renderAll(){ renderGap(); renderResults(); renderCompare(); renderDecum(); renderAssets(); renderTrack(); }
   renderAll();
   renderAutoDiv();
   if (E && !currentHolding) { currentHolding = "0050"; renderHolding(); } /* gallery 直開明細頁時的預設內容 */

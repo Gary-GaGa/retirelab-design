@@ -81,6 +81,19 @@ document.getElementById("f").addEventListener("load", function(){
     doc.getElementById("hdPrice").value = 132;
     click(doc, "#hdApply"); /* 還原現價 */
     click(doc, '#s-holding [data-go="s-ledger"]'); assertScreen(doc, "s-ledger", "明細→返回帳本");
+    /* 再審視修復:追蹤頁=帳本市值、比較頁自結果頁可達、調升滑桿接引擎 */
+    click(doc, '.tabbar [data-tab="track"]');      assertScreen(doc, "s-track", "tab→追蹤");
+    var tvOk = doc.getElementById("trackVal").textContent === doc.getElementById("lgValue").textContent;
+    results.push((tvOk ? "PASS" : "FAIL") + " 追蹤頁進度=帳本市值(單一真相)");
+    click(doc, '.tabbar [data-tab="calc"]');
+    click(doc, '#s-result-etf [data-go="s-compare"]'); assertScreen(doc, "s-compare", "結果→標的比較");
+    click(doc, '#s-compare [data-go="s-result-etf"]'); assertScreen(doc, "s-result-etf", "比較→返回試算");
+    var hero0 = doc.getElementById("etfHero").textContent;
+    var rr = doc.getElementById("raiseRange");
+    rr.value = 10; rr.dispatchEvent(new Event("input", {bubbles: true}));
+    var heroUp = doc.getElementById("etfHero").textContent;
+    results.push((heroUp !== hero0 ? "PASS" : "FAIL") + " 調升滑桿→引擎重算(F-02)");
+    rr.value = 0; rr.dispatchEvent(new Event("input", {bubbles: true}));
     var pass = results.filter(function(r){ return r.indexOf("FAIL") === 0; }).length === 0;
     document.getElementById("out").textContent =
       "NAVTEST " + (pass ? "ALL-PASS" : "HAS-FAIL") + "\n" + results.join("\n");
