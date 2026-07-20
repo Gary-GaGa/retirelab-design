@@ -430,7 +430,7 @@ footer.demo-foot{
           <div class="body">
             <div class="hero">
               <p class="lead">缺口換算後,你需要準備</p>
-              <div class="figure mono" id="goalHero">NT$ 1,500<span class="unit">萬</span></div>
+              <div class="figure mono" id="goalHero" style="font-size:40px;white-space:nowrap">NT$ 1,500<span class="unit">萬</span></div>
               <p class="caption" id="goalFormula">= 每月缺口 50,000 元 ÷ 提領率 4% × 12 個月</p>
             </div>
             <div class="card ledger">
@@ -1411,7 +1411,7 @@ footer.demo-foot{
     var hold = "";
     entries.forEach(function(en, i){
       var pct = value > 0 ? Math.round((en.mv / value) * 100) : 0;
-      hold += '<button class="row holding-row" data-sym="' + en.sym + '"><span class="k"><i class="sw" style="background:' + symColor(en.sym) + '"></i>' + en.sym + " · " + pct + "% · " + fmtNT(en.mv) + '</span><span class="v mono">' + fmtSigned(en.unreal) + " →</span></button>";
+      hold += '<button class="row holding-row" data-sym="' + en.sym + '"><span class="k"><i class="sw" style="background:' + symColor(en.sym) + '"></i>' + en.sym + " · " + pct + '%</span><span class="v mono">' + fmtSigned(en.unreal) + " →</span></button>";
     });
     hold += '<div class="row total"><span class="k">未實現損益合計</span><span class="v mono">' + fmtSigned(un.total) + "</span></div>";
     document.getElementById("lgHoldings").innerHTML = hold;
