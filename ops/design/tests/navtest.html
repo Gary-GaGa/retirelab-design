@@ -103,6 +103,15 @@ document.getElementById("f").addEventListener("load", function(){
     var lbOk = doc.getElementById("goalTarget").textContent.indexOf("15,000,000") < 0;
     lb.value = 18000; lb.dispatchEvent(new Event("input", {bubbles: true}));
     results.push((lbOk ? "PASS" : "FAIL") + " 摺疊內勞保滑桿→目標連動");
+    /* 目標雙模式:直接設定金額(F-01 可覆寫) */
+    click(doc, "#modeDirect");
+    var tr = doc.getElementById("targetRange");
+    tr.value = 30000000; tr.dispatchEvent(new Event("input", {bubbles: true}));
+    var dOk = doc.getElementById("goalTarget").textContent.indexOf("30,000,000") >= 0;
+    results.push((dOk ? "PASS" : "FAIL") + " 直接設定金額→全下游改用該目標");
+    click(doc, "#modeGap");
+    var backOk = doc.getElementById("goalTarget").textContent.indexOf("15,000,000") >= 0;
+    results.push((backOk ? "PASS" : "FAIL") + " 切回現金流推算→目標還原");
     var pass = results.filter(function(r){ return r.indexOf("FAIL") === 0; }).length === 0;
     document.getElementById("out").textContent =
       "NAVTEST " + (pass ? "ALL-PASS" : "HAS-FAIL") + "\n" + results.join("\n");

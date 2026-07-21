@@ -385,21 +385,27 @@ footer.demo-foot{
 
         <!-- 03 缺口引導 (1/4) ============================================= -->
         <section class="screen" id="s-gap" data-name="缺口引導 1/4">
-          <div class="appbar"><span class="title">你的退休缺口</span></div>
+          <div class="appbar"><span class="title">你的目標</span></div>
           <div class="body">
             <div class="steps" aria-label="引導進度 1/4">
               <i class="on"></i><i></i><i></i><i></i><span class="t">1 / 4</span>
             </div>
-            <p style="font-size:15px">退休金有三層:勞保、勞退、自己準備。先抓前兩層,剩下的缺口才是這個 App 要幫你算的。</p>
-            <div class="card ledger">
-              <div class="slider-row">
-                <div class="lab"><span>退休後每月想花多少?</span><output class="mono" id="gapExpOut">NT$ 77,500</output></div>
-                <input type="range" min="30000" max="150000" step="2500" value="77500" id="gapExpense" aria-label="退休後月支出">
-              </div>
-              <div class="row total"><span class="k">自備缺口</span><span class="v" id="gapOut">NT$ 50,000<small>/月</small></span></div>
+            <p style="font-size:15px">「有一天,我不再需要為錢工作 — 那時,我希望每個月仍能自由花用一筆錢。」</p>
+            <div class="seg" role="group" aria-label="目標訂法">
+              <button id="modeGap" aria-pressed="true">以每月現金流推算</button>
+              <button id="modeDirect" aria-pressed="false">直接設定金額</button>
             </div>
-            <p class="caption">用現在的生活水準想像就好,之後隨時能改。政府給付(勞保+勞退,可在下方調整)已先扣除 — 剩下的才是要自己準備的。</p>
-            <details class="fold">
+            <div id="gapFlow">
+              <p class="caption" style="margin-top:8px">退休金有三層:勞保、勞退、自己準備。先抓前兩層,剩下的缺口才是這個 App 要幫你算的。</p>
+              <div class="card ledger">
+                <div class="slider-row">
+                  <div class="lab"><span>那一天之後,每月想花多少?</span><output class="mono" id="gapExpOut">NT$ 77,500</output></div>
+                  <input type="range" min="30000" max="150000" step="2500" value="77500" id="gapExpense" aria-label="退休後月支出">
+                </div>
+                <div class="row total"><span class="k">自備缺口</span><span class="v" id="gapOut">NT$ 50,000<small>/月</small></span></div>
+              </div>
+              <p class="caption">用現在的生活水準想像就好,之後隨時能改。政府給付(勞保+勞退,可在下方調整)已先扣除 — 剩下的才是要自己準備的。</p>
+              <details class="fold">
               <summary>政府給付與提領率(用預設就好,也可以自己調)</summary>
               <div class="fold-body">
                 <div class="card ledger" style="margin-bottom:8px">
@@ -423,7 +429,18 @@ footer.demo-foot{
                   <button aria-pressed="false">5.0%</button>
                 </div>
               </div>
-            </details>
+              </details>
+            </div>
+            <div id="directFlow" hidden>
+              <p class="caption" style="margin-top:8px">不經缺口推算,直接鎖定一個數字 — 不一定是退休,也可以是你單純想達成的金額。</p>
+              <div class="card ledger">
+                <div class="slider-row">
+                  <div class="lab"><span>目標金額</span><output class="mono" id="directOut">NT$ 1,500 萬</output></div>
+                  <input type="range" min="10000000" max="200000000" step="1000000" value="15000000" id="targetRange" aria-label="目標金額">
+                </div>
+              </div>
+              <p class="caption">之後的達標試算、無法達標的三條路、提領期,全部照這個數字算。</p>
+            </div>
             <div class="btn-row"><button class="btn primary" data-go="s-goal">下一步:設定目標</button></div>
           </div>
         </section>
@@ -438,10 +455,12 @@ footer.demo-foot{
               <p class="caption" id="goalFormula">= 每月缺口 50,000 元 ÷ 提領率 4% × 12 個月</p>
             </div>
             <div class="card ledger">
-              <div class="row"><span class="k">退休後月支出(估)</span><span class="v" id="goalExp">NT$ 77,500</span></div>
-              <div class="row"><span class="k">勞保 + 勞退 覆蓋</span><span class="v" id="goalPension">NT$ 27,500</span></div>
-              <div class="row"><span class="k">自備缺口</span><span class="v" id="goalGap">NT$ 50,000<small>/月</small></span></div>
-              <div class="row"><span class="k">提領率</span><span class="v" id="goalSwr">4.0%</span></div>
+              <div id="goalGapRows">
+                <div class="row"><span class="k">退休後月支出(估)</span><span class="v" id="goalExp">NT$ 77,500</span></div>
+                <div class="row"><span class="k">勞保 + 勞退 覆蓋</span><span class="v" id="goalPension">NT$ 27,500</span></div>
+                <div class="row"><span class="k">自備缺口</span><span class="v" id="goalGap">NT$ 50,000<small>/月</small></span></div>
+                <div class="row"><span class="k">提領率</span><span class="v" id="goalSwr">4.0%</span></div>
+              </div>
               <div class="row total"><span class="k">目標資產</span><span class="v" id="goalTarget">NT$ 15,000,000</span></div>
             </div>
             <p class="caption">月支出可依你目前的生活水準調整;之後隨時能在「設定」修改。</p>
@@ -1091,10 +1110,19 @@ footer.demo-foot{
     var pension = Number(document.getElementById("gapLaobao").value) + Number(document.getElementById("gapLaotui").value);
     return { exp: exp, pension: pension, gap: Math.max(0, exp - pension) };
   }
+  var goalMode = "gap"; /* "gap"=以每月現金流推算(F-09) | "direct"=直接設定金額(F-01 可覆寫) */
   function currentTarget(){
+    if (goalMode === "direct") {
+      var el = document.getElementById("targetRange");
+      return el ? Number(el.value) : DEMO.target;
+    }
     if (!E) return DEMO.target;
     var g = gapValues();
     return E.suggestedTargetAmount({ desiredMonthlyExpense: g.exp, estimatedMonthlyPension: g.pension, withdrawalRate: swrValue() });
+  }
+  function fmtWan(target){ /* <1 億 → N,NNN 萬;≥1 億 → X.X 億 */
+    if (target >= 100000000) return (target / 100000000).toFixed(1).replace(/\.0$/, "") + " 億";
+    return Math.round(target / 10000).toLocaleString("en-US") + " 萬";
   }
 
   /* 已累積資產來源(F-12 進度整合 → F-01:帳本市值可作為試算起點) */
@@ -1343,10 +1371,19 @@ footer.demo-foot{
     var a1 = mAge(mcRun(m + 6000).p50Months);
     var aBase = mAge(SIM.p50Months);
     var delay = Number.isFinite(aBase) ? Math.max(1, Math.ceil(aBase - wish)) : null;
-    /* 月支出降 5,000:目標依 §6.5 重算(雙效:缺口變小 + 可投入 +5,000) */
-    var g = gapValues();
-    var target3 = E.suggestedTargetAmount({ desiredMonthlyExpense: g.exp - 5000, estimatedMonthlyPension: g.pension, withdrawalRate: swrValue() });
-    var a3 = mAge(mcRun(m + 5000, target3).p50Months);
+    /* 路三:gap 模式=月支出降 5,000(雙效);direct 模式=目標調降 150 萬 */
+    var a3, r3Label;
+    if (goalMode === "direct") {
+      r3Label = "目標調降 150 萬";
+      a3 = mAge(mcRun(m, Math.max(1000000, target - 1500000)).p50Months);
+    } else {
+      r3Label = "月支出降 5,000";
+      var g = gapValues();
+      var target3 = E.suggestedTargetAmount({ desiredMonthlyExpense: g.exp - 5000, estimatedMonthlyPension: g.pension, withdrawalRate: swrValue() });
+      a3 = mAge(mcRun(m + 5000, target3).p50Months);
+    }
+    var r3LabelEl = document.querySelector('#s-fail [id="failR3"]');
+    if (r3LabelEl) r3LabelEl.parentElement.querySelector(".k").textContent = r3Label;
     document.getElementById("failR1").innerHTML = fmtAge(a1) + " 歲<small>達標</small>";
     document.getElementById("failR2Label").textContent = delay == null ? "延後退休" : "延後退休 " + delay + " 年";
     document.getElementById("failR2").innerHTML = fmtAge(aBase) + " 歲<small>達標</small>";
@@ -1457,13 +1494,20 @@ footer.demo-foot{
     if (!document.getElementById("gapExpense")) return;
     var g = gapValues(), target = currentTarget();
     var swrPct = (swrValue() * 100).toFixed(1) + "%";
-    var wan = Math.round(target / 10000).toLocaleString("en-US");
+    var wan = fmtWan(target);
+    var direct = goalMode === "direct";
+    var directOut = document.getElementById("directOut");
+    if (directOut) directOut.textContent = "NT$ " + wan;
+    var gapRows = document.getElementById("goalGapRows");
+    if (gapRows) gapRows.hidden = direct;
     document.getElementById("gapExpOut").textContent = fmtNT(g.exp);
     document.getElementById("gapLbOut").textContent = fmtNT(Number(document.getElementById("gapLaobao").value));
     document.getElementById("gapLtOut").textContent = fmtNT(Number(document.getElementById("gapLaotui").value));
     document.getElementById("gapOut").innerHTML = fmtNT(g.gap) + "<small>/月</small>";
-    document.getElementById("goalHero").innerHTML = "NT$ " + wan + '<span class="unit">萬</span>';
-    document.getElementById("goalFormula").textContent = "= 每月缺口 " + g.gap.toLocaleString("en-US") + " 元 ÷ 提領率 " + swrPct + " × 12 個月";
+    document.getElementById("goalHero").innerHTML = "NT$ " + wan.replace(/ (萬|億)$/, '<span class="unit">$1</span>');
+    document.getElementById("goalFormula").textContent = direct
+      ? "你直接設定的目標金額(未經缺口推算)"
+      : "= 每月缺口 " + g.gap.toLocaleString("en-US") + " 元 ÷ 提領率 " + swrPct + " × 12 個月";
     document.getElementById("goalExp").textContent = fmtNT(g.exp);
     document.getElementById("goalPension").textContent = fmtNT(g.pension);
     document.getElementById("goalGap").innerHTML = fmtNT(g.gap) + "<small>/月</small>";
@@ -1472,7 +1516,7 @@ footer.demo-foot{
     document.getElementById("setSwr").textContent = swrPct;
     document.getElementById("setExp").textContent = fmtNT(g.exp);
     document.getElementById("setPension").innerHTML = fmtNT(g.pension) + "<small>/月</small>";
-    document.getElementById("failTargetLabel").textContent = "目標 NT$ " + wan + " 萬";
+    document.getElementById("failTargetLabel").textContent = "目標 NT$ " + wan;
   }
 
   /* 稅費差異註記(F-08:兩次真模擬對照) ------------------------------------ */
@@ -1768,10 +1812,24 @@ footer.demo-foot{
   feeOff.addEventListener("click", function(){ setFee(false); });
 
   /* 缺口/提領率/級距 事件與初始渲染 ---------------------------------------- */
-  ["gapExpense", "gapLaobao", "gapLaotui"].forEach(function(id){
+  ["gapExpense", "gapLaobao", "gapLaotui", "targetRange"].forEach(function(id){
     var el = document.getElementById(id);
     if (el) el.addEventListener("input", function(){ renderAll(); });
   });
+  (function initGoalMode(){
+    var mG = document.getElementById("modeGap"), mD = document.getElementById("modeDirect");
+    if (!mG) return;
+    function setGoalMode(direct){
+      goalMode = direct ? "direct" : "gap";
+      mG.setAttribute("aria-pressed", String(!direct));
+      mD.setAttribute("aria-pressed", String(direct));
+      document.getElementById("gapFlow").hidden = direct;
+      document.getElementById("directFlow").hidden = !direct;
+      renderAll();
+    }
+    mG.addEventListener("click", function(){ setGoalMode(false); });
+    mD.addEventListener("click", function(){ setGoalMode(true); });
+  })();
   var swrGroup = document.getElementById("swrChips");
   if (swrGroup) swrGroup.addEventListener("click", function(e){ if (e.target.closest("button")) renderAll(); });
   var taxGroup = document.getElementById("taxChips");
