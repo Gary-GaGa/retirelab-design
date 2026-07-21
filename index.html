@@ -85,7 +85,7 @@ nav.screens button[aria-current="true"]{
   background:var(--a1-wash);color:var(--a1);font-weight:600;
 }
 nav.screens button[aria-current="true"] .no{color:var(--a1)}
-.stage{flex:1;display:flex;justify-content:center}
+.stage{flex:1;display:flex;justify-content:center;min-width:0} /* min-width:0:flex item 預設 min-width:auto 會擋住 .phone 的 max-width:100% 縮放,造成窄螢幕 16px 溢出 */
 .app-mode nav.screens{display:none}
 .demo-bar .seg{width:auto;flex:0 0 auto}
 .demo-bar .seg button{min-width:88px;padding:0 14px}
@@ -102,6 +102,9 @@ nav.screens button[aria-current="true"] .no{color:var(--a1)}
 }
 @media (max-width:820px){
   .layout{flex-direction:column}
+  /* stage 改 block、phone 改流體:flex stretch 會被 .phone 固定 390px 撐破,造成窄機 16px 溢出 */
+  .stage{display:block}
+  .phone{width:auto;max-width:390px;margin:0 auto}
   nav.screens{position:static;flex:none;width:100%}
   /* 換行顯示全部項目:iOS 無捲軸提示,橫向捲動看起來像被切掉 */
   nav.screens ol{display:flex;flex-wrap:wrap;gap:4px 2px;padding-bottom:8px}
@@ -1036,7 +1039,7 @@ footer.demo-foot{
   </div>
 
   <footer class="demo-foot">
-    設計稿 demo · 對應 PRD v0.2 + design review G1–G8 · tokens 依 design/DESIGN_SPEC.md(FROZEN)· 深色模式由右上切換(App 內由 prop 控制)
+    設計稿 demo · 對應 PRD v0.8 · tokens 依 design/DESIGN_SPEC.md(FROZEN)· 深色模式由右上切換(App 內由 prop 控制)
   </footer>
 </div>
 
