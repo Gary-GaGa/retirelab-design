@@ -467,6 +467,13 @@ footer.demo-foot{
               </div>
               <div class="row total"><span class="k">目標資產</span><span class="v" id="goalTarget">NT$ 15,000,000</span></div>
             </div>
+            <div class="card ledger">
+              <div class="slider-row">
+                <div class="lab"><span>希望幾歲前退休?</span><output class="mono" id="wishOut">60 歲</output></div>
+                <input type="range" min="50" max="75" step="1" value="60" id="wishRange" aria-label="希望退休年齡">
+              </div>
+            </div>
+            <p class="caption">這是你的標準,不是我們的 — 若試算出的達標年齡比它晚,結果頁會就地提醒,並給出調整的路。</p>
             <p class="caption">月支出可依你目前的生活水準調整;之後隨時能在「設定」修改。</p>
             <div class="btn-row"><button class="btn primary" data-go="s-invest">下一步:投入計畫</button></div>
           </div>
@@ -593,6 +600,13 @@ footer.demo-foot{
               <button id="modeAdv" aria-pressed="false">進階</button>
             </div>
 
+            <!-- 晚於希望年齡的就地提醒(兩種模式共用;琥珀=提醒,非錯誤) -->
+            <div class="risk-block" id="wishNotice" hidden>
+              <div class="rb-title">比你希望的晚</div>
+              <span id="wishNoticeText">以中位數(P50)估算的達標年齡,晚於你希望的退休年齡。</span>
+              <button class="fail-link" id="wishNoticeGo" data-go="s-fail">看拉近缺口的三條路 →</button>
+            </div>
+
             <!-- 簡單模式 -->
             <div id="etfSimple" class="chart-swap">
               <div class="pcards">
@@ -629,7 +643,6 @@ footer.demo-foot{
                   <div class="lab"><span>每月投入</span><output class="mono" id="advOut">NT$ 15,000</output></div>
                   <input type="range" min="5000" max="50000" step="1000" value="15000" id="advRange" aria-label="每月投入(快速估算)">
                   <span class="sim-state" id="simState">模擬結果 · 1,000 次情境</span>
-                  <button class="fail-link" id="failLink" data-go="s-fail" hidden>以此投入難以達標 — 查看調整建議 →</button>
                 </div>
               </div>
             </div>
@@ -647,9 +660,9 @@ footer.demo-foot{
           </div>
           <div class="body">
             <div class="hero">
-              <p class="lead">若年報酬固定 6%,你會在</p>
+              <p class="lead">若年報酬固定 <span class="mono" id="stockRetLead">6%</span>,你會在</p>
               <div class="figure mono" id="stockHero">60<span class="unit">歲</span><span class="verb">達標</span></div>
-              <p class="caption">單一假設的算術結果 — 不是預測,也沒有機率。</p>
+              <p class="caption">你設定的單一假設,算術外推的結果 — 不是預測,也沒有機率。</p>
             </div>
 
             <div class="card chart-card">
@@ -663,7 +676,7 @@ footer.demo-foot{
                 <circle cx="150" cy="92" r="4" fill="var(--a1)"/>
                 <circle cx="150" cy="92" r="1.6" fill="var(--surf)"/>
                 <text x="150" y="148" text-anchor="middle" font-family="var(--sans)" font-size="10" fill="var(--ink-soft)">今天</text>
-                <text x="326" y="48" text-anchor="end" font-family="var(--mono)" font-size="9" fill="var(--a1)">6%/年</text>
+                <text id="stockRetChart" x="326" y="48" text-anchor="end" font-family="var(--mono)" font-size="9" fill="var(--a1)">6%/年</text>
               </svg>
               <div class="chart-legend">
                 <span><i style="background:var(--a1)"></i>已投入(已知)</span>
@@ -672,17 +685,22 @@ footer.demo-foot{
             </div>
 
             <div class="card ledger">
-              <div class="row"><span class="k">報酬假設</span><span class="v">6.0%<small>/年,固定(實質 ≈3.9%,通膨 2%)</small></span></div>
+              <div class="slider-row">
+                <div class="lab"><span>年報酬假設(固定)</span><output class="mono" id="stockRetOut">6.0%</output></div>
+                <input type="range" min="2" max="10" step="0.5" value="6" id="stockRetRange" aria-label="個股年報酬假設">
+              </div>
+              <div class="row"><span class="k">換算實質報酬</span><span class="v" id="stockRetReal">≈3.9%<small>/年(通膨 2%)</small></span></div>
               <div class="row"><span class="k">每月投入</span><span class="v" id="stockMonthly">NT$ 15,000</span></div>
               <div class="row total"><span class="k">達標年齡</span><span class="v" id="stockAge">60 歲</span></div>
             </div>
+            <p class="caption">6% 只是預設,不是建議 — 這條線的假設由你決定,拉動看看年齡怎麼變。</p>
 
             <div class="risk-block">
               <div class="rb-title">個股風險揭露</div>
               單一個股沒有分散,歷史也不代表未來。此頁不提供機率區間 — 因為對單一公司,我們算不出誠實的機率。集中持股可能大幅偏離任何假設,請自行評估。
             </div>
 
-            <p class="caption">資料來源:合成示範資料 · 實質報酬試算(通膨 2%/年)· 單一假設試算,非未來報酬之保證。 <button class="link" data-go="s-method" style="font-size:inherit">方法與資料來源 →</button></p>
+            <p class="caption">資料來源:合成示範資料 · 實質報酬試算(通膨 2%/年)· 依你設定的單一報酬假設試算,非未來報酬之保證。 <button class="link" data-go="s-method" style="font-size:inherit">方法與資料來源 →</button></p>
           </div>
         </section>
 
@@ -843,8 +861,9 @@ footer.demo-foot{
               <button class="row holding-row" data-go="s-gap" data-reveal="gapFold"><span class="k">提領率</span><span class="v"><span id="setSwr">4.0%</span> →</span></button>
               <button class="row holding-row" data-go="s-gap"><span class="k">退休後月支出</span><span class="v"><span id="setExp">NT$ 77,500</span> →</span></button>
               <button class="row holding-row" data-go="s-gap" data-reveal="gapFold"><span class="k">勞保/勞退覆蓋</span><span class="v"><span id="setPension">NT$ 27,500<small>/月</small></span> →</span></button>
+              <button class="row holding-row" data-go="s-goal"><span class="k">希望退休年齡</span><span class="v"><span id="setWish">60 歲</span> →</span></button>
             </div>
-            <p class="set-note">點任一列可回「缺口引導」調整,結果會即時重算。</p>
+            <p class="set-note">點任一列可回對應頁面調整,結果會即時重算。</p>
 
             <div class="section-label" style="margin-top:8px">外觀</div>
             <div class="card ledger">
@@ -1057,9 +1076,9 @@ footer.demo-foot{
 
   /* ── 真引擎接線:RetireLabEngine(@retirelab/engine demo bundle,engine.js)──
      全部本地運算;fixtures 合成資料(Rule 7);實質報酬 = 名目 ÷ 通膨(示範假設 2%/年)。
-     示範情境:目標 1,500 萬(今日購買力)、既有資產 80 萬、希望 60 歲前退休。 */
+     示範情境:目標 1,500 萬(今日購買力)、既有資產 80 萬;希望退休年齡由目標頁輸入(預設 60)。 */
   var E = window.RetireLabEngine || null;
-  var DEMO = { target: 15000000, current: 800000, sims: 1000, seed: 42, inflation: 0.02, wishAge: 60, stockReturn: 0.06 };
+  var DEMO = { target: 15000000, current: 800000, sims: 1000, seed: 42, inflation: 0.02, stockReturn: 0.06 };
   var SIM = null, realReturns = null, geoMonthly = 0;
   if (E) {
     var infM = E.monthlyRate(DEMO.inflation);
@@ -1075,6 +1094,14 @@ footer.demo-foot{
   function currentAge(){ var el = document.getElementById("ageRange"); return el ? Number(el.value) : 35; }
   function planMonthly(){ var el = document.getElementById("advRange"); return el ? Number(el.value) : 15000; }
   function raiseValue(){ var el = document.getElementById("raiseRange"); return el ? Number(el.value) / 100 : 0; } /* F-02 投入年調升(引擎支援) */
+  function wishAge(){ /* 希望退休年齡(目標頁輸入;下限=目前年齡+1) — 無法達標的判準由使用者擁有 */
+    var el = document.getElementById("wishRange");
+    return Math.max(el ? Number(el.value) : 60, currentAge() + 1);
+  }
+  function stockReturn(){ /* 個股年報酬假設(結果頁可調;引擎 solveMonths 接受任意 annualReturn) */
+    var el = document.getElementById("stockRetRange");
+    return el ? Number(el.value) / 100 : DEMO.stockReturn;
+  }
   function mcRun(monthly, target, series){
     var net = monthly, drag = 0;
     if (feeIncluded) {
@@ -1169,6 +1196,7 @@ footer.demo-foot{
     tabbar.querySelectorAll("button").forEach(function(b){
       b.setAttribute("aria-current", String(b.dataset.tab === tab));
     });
+    if (screens[i].id === "s-fail") renderFail(); /* 任何入口(側欄/深連/tab)都反映當前參數與希望年齡 */
     if (!reduced) {
       screens[i].querySelectorAll(".printline").forEach(function(p){
         var c = p.cloneNode(true); p.parentNode.replaceChild(c, p);
@@ -1210,7 +1238,6 @@ footer.demo-foot{
     if (!appMode) return;
     var go = e.target.closest("[data-go]");
     if (go) {
-      if (go.dataset.go === "s-fail") renderFail();
       if (go.dataset.reveal) { /* 設定列 → 缺口引導:目標控制在摺疊內時,依使用者意圖展開 */
         var rv = document.getElementById(go.dataset.reveal);
         if (rv) rv.open = true;
@@ -1286,6 +1313,19 @@ footer.demo-foot{
     renderAll();
   });
 
+  /* 希望退休年齡 slider(使用者擁有「無法達標」的判準;SIM 不受它影響,不需重跑模擬) */
+  var wishRange = document.getElementById("wishRange");
+  if (wishRange) wishRange.addEventListener("input", function(){
+    document.getElementById("wishOut").textContent = wishRange.value + " 歲";
+    document.getElementById("setWish").textContent = wishRange.value + " 歲";
+    updateWishNotice();
+    if (document.getElementById("s-fail").classList.contains("active")) renderFail();
+  });
+
+  /* 個股年報酬假設 slider(引擎 solveMonths 即時重算) */
+  var stockRetRange = document.getElementById("stockRetRange");
+  if (stockRetRange) stockRetRange.addEventListener("input", function(){ renderStock(); });
+
   /* 結果 ETF:簡單/進階 --------------------------------------------------- */
   var mS = document.getElementById("modeSimple"), mA = document.getElementById("modeAdv");
   var simple = document.getElementById("etfSimple"), adv = document.getElementById("etfAdv");
@@ -1360,14 +1400,32 @@ footer.demo-foot{
       cards[2].innerHTML = fmtAge(a90) + "<small> 歲</small>";
     }
     setFanPaths(yForAge(a10), yForAge(a50), yForAge(a90));
+    updateWishNotice();
     renderStock();
     updateFeeNote();
   }
+  function updateWishNotice(){ /* P50 晚於希望年齡 → 簡單/進階模式都就地提醒(琥珀=提醒,非錯誤) */
+    var el = document.getElementById("wishNotice");
+    if (!el) return;
+    if (!E || !SIM) { el.hidden = true; return; }
+    var wish = wishAge(), a50 = mAge(SIM.p50Months);
+    if (!(a50 > wish)) { el.hidden = true; return; }
+    document.getElementById("wishNoticeText").textContent = Number.isFinite(a50)
+      ? "以中位數(P50)估算約 " + fmtAge(a50) + " 歲達標 — 晚於你希望的 " + wish + " 歲。"
+      : "以目前投入,超過一半的模擬情境無法在 80 歲前達標 — 晚於你希望的 " + wish + " 歲。";
+    el.hidden = false;
+  }
   function renderStock(){
     if (!E) return;
-    var gross = feeIncluded ? E.afterTaxAnnualReturn(DEMO.stockReturn, taxProfile()) : DEMO.stockReturn;
+    var r = stockReturn();
+    var gross = feeIncluded ? E.afterTaxAnnualReturn(r, taxProfile()) : r;
     var months = E.solveMonths({ targetAmount: currentTarget(), currentAssets: currentAssets(), monthlyContribution: feeIncluded ? planMonthly() * E.netContributionFactor(TAX) : planMonthly(), annualReturn: gross, annualInflation: DEMO.inflation, maxMonths: 720 });
     var ageTxt = months == null ? "80+" : fmtAge(currentAge() + months / 12);
+    var pct = (r * 100).toFixed(1).replace(/\.0$/, "");
+    document.getElementById("stockRetLead").textContent = pct + "%";
+    document.getElementById("stockRetOut").textContent = (r * 100).toFixed(1) + "%";
+    document.getElementById("stockRetReal").innerHTML = "≈" + (E.realAnnualRate(r, DEMO.inflation) * 100).toFixed(1) + '%<small>/年(通膨 2%)</small>';
+    document.getElementById("stockRetChart").textContent = pct + "%/年";
     document.getElementById("stockHero").innerHTML = ageTxt + '<span class="unit">歲</span><span class="verb">達標</span>';
     document.getElementById("stockAge").textContent = ageTxt + " 歲";
     document.getElementById("stockMonthly").textContent = "NT$ " + planMonthly().toLocaleString("en-US");
@@ -1377,7 +1435,7 @@ footer.demo-foot{
     if (!SIM) SIM = mcRun(planMonthly());
     var m = planMonthly();
     var target = currentTarget();
-    var wish = Math.max(DEMO.wishAge, currentAge() + 1);
+    var wish = wishAge();
     var wishMonths = Math.round((wish - currentAge()) * 12);
     var realAnnual = Math.pow(1 + geoMonthly, 12) - 1; /* 合成樣本幾何平均(實質)*/
     var fv = E.futureValue({ targetAmount: target, currentAssets: currentAssets(), monthlyContribution: m, annualReturn: realAnnual }, wishMonths);
@@ -1405,24 +1463,16 @@ footer.demo-foot{
     document.getElementById("failR2").innerHTML = fmtAge(aBase) + " 歲<small>達標</small>";
     document.getElementById("failR3").innerHTML = fmtAge(a3) + " 歲<small>達標</small>";
   }
-  function isFail(){
-    if (!E || !SIM) return Number(advRange.value) <= 7000; /* fallback */
-    return mAge(SIM.p50Months) > Math.max(DEMO.wishAge, currentAge() + 1);
-  }
   advRange.addEventListener("input", function(){
     simState.textContent = "快速估算中⋯(放開後跑完整模擬)";
     simState.classList.add("live");
-    document.getElementById("failLink").hidden = true; /* 拖曳中不顯示,放開後再判斷 */
     investRange.value = advRange.value;
     investOut.textContent = "NT$ " + Number(investRange.value).toLocaleString("en-US");
-    renderResults();
+    renderResults(); /* WCAG 3.2.2:不自動跳頁 — 未達希望年齡時由 updateWishNotice 就地提醒 */
   });
   advRange.addEventListener("change", function(){
     simState.textContent = "模擬結果 · 1,000 次情境";
     simState.classList.remove("live");
-    /* WCAG 3.2.2:不自動跳頁 — 低投入時就地顯示明確的導航動作 */
-    var failLink = document.getElementById("failLink");
-    failLink.hidden = !(appMode && isFail());
   });
   /* 初始渲染於檔尾 renderAll() */
 
@@ -1592,7 +1642,7 @@ footer.demo-foot{
     var assets = currentTarget();
     var r = E.runDecumulation({ initialAssets: Math.max(1, assets), monthlyWithdrawal: w, monthlyReturns: realReturns, simulations: DEMO.sims, seed: DEMO.seed });
     var achieved = SIM && Number.isFinite(SIM.p50Months) ? mAge(SIM.p50Months) : null;
-    var retAge = achieved != null ? Math.max(currentAge() + 1, achieved) : Math.max(DEMO.wishAge, currentAge() + 1);
+    var retAge = achieved != null ? Math.max(currentAge() + 1, achieved) : wishAge();
     var startNote = document.getElementById("decumStartNote");
     if (startNote) startNote.textContent = "未來功能預覽,僅適用 ETF 類;「用罄」= 資產歸零;100+ 表示 60 年模擬期內未用罄。自 " + Math.round(retAge) + " 歲(中位數 P50 達標年齡)退休起算。";
     var dAge = function(mo){

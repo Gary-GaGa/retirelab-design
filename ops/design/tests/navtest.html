@@ -23,27 +23,43 @@ document.getElementById("f").addEventListener("load", function(){
     assertScreen(doc, "s-disclaimer", "載入自動推進");
     click(doc, '[data-go="s-gap"]');           assertScreen(doc, "s-gap", "免責→缺口引導");
     click(doc, '[data-go="s-goal"]');          assertScreen(doc, "s-goal", "引導→目標");
+    var wr = doc.getElementById("wishRange");
+    results.push((wr && wr.value === "60" ? "PASS" : "FAIL") + " 目標頁「希望幾歲前退休」輸入存在且預設 60");
     click(doc, '[data-go="s-invest"]');        assertScreen(doc, "s-invest", "目標→投入");
     click(doc, '[data-go="s-target"]');        assertScreen(doc, "s-target", "投入→標的");
     click(doc, "#pickStock");
     click(doc, "#startCalc");                  assertScreen(doc, "s-result-stock", "個股→確定性結果");
     var tabbarVisible = doc.querySelector(".tabbar").style.display !== "none";
     results.push((tabbarVisible ? "PASS" : "FAIL") + " tabbar 在結果頁顯示");
+    /* 個股報酬假設可調(Question 2:假設由使用者擁有,引擎 solveMonths 重算) */
+    var sa0 = doc.getElementById("stockAge").textContent;
+    var sr = doc.getElementById("stockRetRange");
+    sr.value = 2; sr.dispatchEvent(new Event("input", {bubbles: true}));
+    results.push((doc.getElementById("stockAge").textContent !== sa0 ? "PASS" : "FAIL") + " 個股報酬假設 6%→2% → 達標年齡重算");
+    sr.value = 6; sr.dispatchEvent(new Event("input", {bubbles: true}));
     click(doc, '.tabbar [data-tab="track"]');  assertScreen(doc, "s-track", "tab→追蹤");
     click(doc, '.tabbar [data-tab="settings"]'); assertScreen(doc, "s-settings", "tab→設定");
     click(doc, '.tabbar [data-tab="calc"]');   assertScreen(doc, "s-result-etf", "tab→試算(ETF)");
+    /* wishAge 提醒:預設 60(黃金值 58≤60)不顯示;簡單模式也要能看見並可達 s-fail */
+    var wn = doc.getElementById("wishNotice");
+    var wnHidden = wn.hidden && doc.defaultView.getComputedStyle(wn).display === "none";
+    results.push((wnHidden ? "PASS" : "FAIL") + " 預設情境(P50 58 ≤ 希望 60)不顯示提醒(rendered state)");
+    wr.value = 55; wr.dispatchEvent(new Event("input", {bubbles: true}));
+    results.push((!wn.hidden ? "PASS" : "FAIL") + " 希望 55 歲(<P50)→ 簡單模式就地顯示提醒");
+    click(doc, "#wishNoticeGo");               assertScreen(doc, "s-fail", "提醒連結→無法達標(簡單模式)");
+    var faOk = doc.getElementById("failAge").textContent.indexOf("55") >= 0;
+    results.push((faOk ? "PASS" : "FAIL") + " 無法達標頁文案反映使用者選的 55 歲");
+    click(doc, '#s-fail [data-go="s-invest"]'); assertScreen(doc, "s-invest", "無法達標→調整計畫");
+    wr.value = 60; wr.dispatchEvent(new Event("input", {bubbles: true}));
+    click(doc, '.tabbar [data-tab="calc"]');   assertScreen(doc, "s-result-etf", "tab→試算(回結果頁)");
     click(doc, "#modeAdv"); /* 切到進階模式 */
-    var fl0 = doc.getElementById("failLink");
-    var hiddenByDefault = fl0.hidden && doc.defaultView.getComputedStyle(fl0).display === "none";
-    results.push((hiddenByDefault ? "PASS" : "FAIL") + " 預設投入下連結不渲染(rendered state,非僅 DOM property)");
     var adv = doc.getElementById("advRange");
     adv.value = 6000;
     adv.dispatchEvent(new Event("input", {bubbles: true}));
     adv.dispatchEvent(new Event("change", {bubbles: true}));
     assertScreen(doc, "s-result-etf", "投入過低不自動跳頁(WCAG 3.2.2)");
-    var fl = doc.getElementById("failLink");
-    results.push((fl && !fl.hidden ? "PASS" : "FAIL") + " 低投入→顯示「查看調整建議」連結");
-    fl.click();                                assertScreen(doc, "s-fail", "點連結→無法達標");
+    results.push((!wn.hidden ? "PASS" : "FAIL") + " 低投入→進階模式就地顯示提醒");
+    click(doc, "#wishNoticeGo");               assertScreen(doc, "s-fail", "提醒連結→無法達標(進階模式)");
     click(doc, '#s-fail [data-go="s-invest"]'); assertScreen(doc, "s-invest", "無法達標→調整計畫");
     /* v0.8 新畫面與動態接線 */
     click(doc, '.tabbar [data-tab="ledger"]');  assertScreen(doc, "s-ledger", "tab→帳本");
