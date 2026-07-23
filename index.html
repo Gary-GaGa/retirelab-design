@@ -155,8 +155,10 @@ nav.screens button[aria-current="true"] .no{color:var(--a1)}
 .row .v small{font-family:var(--sans);color:var(--ink-faint);font-size:11px;margin-left:4px}
 .row.total .k{color:var(--ink);font-weight:600}
 .row.total .v{font-weight:700;color:var(--a1)}
-.row .link{margin-left:auto;color:var(--a1);font-size:13px;font-weight:600;text-decoration:none}
-.row .link:hover{text-decoration:underline}
+.link{color:var(--a1);font-size:13px;font-weight:600;text-decoration:underline;text-underline-offset:2px}
+.row .link,.appbar .link{text-decoration:none} /* 列/appbar 位置本身已有 affordance,底線留給 hover;caption 內連結恆有底線 */
+.row .link:hover,.appbar .link:hover{text-decoration:underline}
+.row .link{margin-left:auto}
 
 /* hero ------------------------------------------------------------------- */
 .hero{padding:8px 4px}
@@ -239,7 +241,7 @@ nav.screens button[aria-current="true"] .no{color:var(--a1)}
 .slider-row .lab{display:flex;font-size:13px;color:var(--ink-soft)}
 .slider-row .lab output{margin-left:auto;font-family:var(--mono);font-weight:700;color:var(--ink)}
 input[type="range"]{width:100%;accent-color:var(--a1);height:28px}
-.sim-state{font-size:11.5px;color:var(--ink-faint);font-family:var(--mono)}
+.sim-state{font-size:11.5px;color:var(--ink-faint)} /* 整句用內文字體;mono 僅限句中數字(spec:mono for figures only) */
 .sim-state.live{color:var(--ink-soft)}
 .fail-link:not([hidden]){
   display:block;min-height:44px;padding:4px 6px;text-align:left;
@@ -292,7 +294,7 @@ button.holding-row{cursor:pointer;background:none;border:0;font:inherit;width:10
   .chart-swap{transition:opacity 0.25s ease}
 }
 .variant-grid{display:flex;flex-direction:column;gap:14px}
-.variant-grid h3{font-size:13px;color:var(--ink-soft);font-weight:600;margin-bottom:8px}
+.variant-grid h2{font-size:13px;color:var(--ink-soft);font-weight:600;margin-bottom:8px} /* h2:接續 demo-bar h1,不跳級(視覺同前 h3) */
 .err-icon{
   width:44px;height:44px;border-radius:50%;border:2px solid var(--err);
   color:var(--err);display:flex;align-items:center;justify-content:center;
@@ -647,7 +649,7 @@ footer.demo-foot{
                 <div class="slider-row">
                   <div class="lab"><span>每月投入</span><output class="mono" id="advOut">NT$ 15,000</output></div>
                   <input type="range" min="5000" max="50000" step="1000" value="15000" id="advRange" aria-label="每月投入(快速估算)">
-                  <span class="sim-state" id="simState">模擬結果 · 1,000 次情境</span>
+                  <span class="sim-state" id="simState">模擬結果 · <span class="mono">1,000</span> 次情境</span>
                 </div>
               </div>
             </div>
@@ -890,7 +892,7 @@ footer.demo-foot{
           <div class="body variant-grid">
 
             <div>
-              <h3>行情過期(amber 條,置於結果頁頂部)</h3>
+              <h2>行情過期(amber 條,置於結果頁頂部)</h2>
               <div class="card" style="overflow:hidden">
                 <div class="amber-bar">行情資料已過期 · 上次更新 3 天前<button class="act">重新整理</button></div>
                 <div class="ledger">
@@ -900,7 +902,7 @@ footer.demo-foot{
             </div>
 
             <div>
-              <h3>載入中(skeleton)</h3>
+              <h2>載入中(skeleton)</h2>
               <div class="card ledger" aria-hidden="true">
                 <div class="row"><span class="skel" style="width:35%"></span><span class="skel" style="width:20%;margin-left:auto"></span></div>
                 <div class="row"><span class="skel" style="width:45%"></span><span class="skel" style="width:24%;margin-left:auto"></span></div>
@@ -909,7 +911,7 @@ footer.demo-foot{
             </div>
 
             <div>
-              <h3>空狀態</h3>
+              <h2>空狀態</h2>
               <div class="card" style="padding:24px 16px;text-align:center">
                 <svg width="56" height="34" viewBox="0 0 120 34" aria-hidden="true" style="margin-bottom:8px">
                   <path d="M4 20 H56" stroke="var(--rule)" stroke-width="3" stroke-linecap="round" fill="none"/>
@@ -923,7 +925,7 @@ footer.demo-foot{
             </div>
 
             <div>
-              <h3>錯誤</h3>
+              <h2>錯誤</h2>
               <div class="card err-card" style="padding:24px 16px;text-align:center">
                 <div class="err-icon">!</div>
                 <p class="err-title">無法載入資料</p>
@@ -943,7 +945,7 @@ footer.demo-foot{
             <div class="card ledger">
               <div class="row"><span class="k">樣本</span><span class="v">23 年台股月報酬</span></div>
               <div class="row"><span class="k">資料版本</span><span class="v mono">fixtures-2026-07</span></div>
-              <div class="row total"><span class="k">性質</span><span class="v">合成示範資料(Q2 前非真實行情)</span></div>
+              <div class="row total"><span class="k">性質</span><span class="v">合成示範資料(非真實行情)</span></div>
             </div>
             <div class="section-label">模擬方法</div>
             <p style="font-size:14px">模擬重抽樣自台股同一條歷史路徑;樣本約 23 年、市值集中於少數權值股,涵蓋之市場情境有限。P10–P90 為歷史條件下的分佈,非未來機率之保證。</p>
@@ -1016,8 +1018,8 @@ footer.demo-foot{
             <div class="card ledger">
               <div class="row"><span class="k">起始資產(承接累積期目標)</span><span class="v mono" id="decumAssets">—</span></div>
               <div class="row"><span class="k">保守(10% 情境更早用罄)</span><span class="v mono" id="decumP10">—</span></div>
-              <div class="row"><span class="k">中位</span><span class="v mono" id="decumP50">—</span></div>
-              <div class="row total"><span class="k">樂觀(90% 情境在此之前用罄)</span><span class="v mono" id="decumP90">—</span></div>
+              <div class="row total"><span class="k">中位(一半情境在此之前用罄)</span><span class="v mono" id="decumP50">—</span></div>
+              <div class="row"><span class="k">樂觀(90% 情境在此之前用罄)</span><span class="v mono" id="decumP90">—</span></div>
             </div>
             <p class="caption" id="decumStartNote">未來功能預覽,僅適用 ETF 類;「用罄」= 資產歸零;100+ 表示 60 年模擬期內未用罄。</p>
           </div>
@@ -1561,7 +1563,7 @@ footer.demo-foot{
     renderResults(); /* WCAG 3.2.2:不自動跳頁 — 未達希望年齡時由 updateWishNotice 就地提醒 */
   });
   advRange.addEventListener("change", function(){
-    simState.textContent = "模擬結果 · 1,000 次情境";
+    simState.innerHTML = '模擬結果 · <span class="mono">1,000</span> 次情境';
     simState.classList.remove("live");
     flushDirty();
     announceResult();
