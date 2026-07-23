@@ -31,6 +31,9 @@ document.getElementById("f").addEventListener("load", function(){
     click(doc, "#startCalc");                  assertScreen(doc, "s-result-stock", "個股→確定性結果");
     var tabbarVisible = doc.querySelector(".tabbar").style.display !== "none";
     results.push((tabbarVisible ? "PASS" : "FAIL") + " tabbar 在結果頁顯示");
+    /* a11y:tabbar 是畫面間導覽,應為 nav 語意而非 tablist */
+    var tbEl = doc.querySelector(".tabbar");
+    results.push((tbEl.tagName === "NAV" && !tbEl.hasAttribute("role") ? "PASS" : "FAIL") + " tabbar 為 <nav> 導覽(非 tablist)");
     /* 個股報酬假設可調(Question 2:假設由使用者擁有,引擎 solveMonths 重算) */
     var sa0 = doc.getElementById("stockAge").textContent;
     var sr = doc.getElementById("stockRetRange");
@@ -40,6 +43,9 @@ document.getElementById("f").addEventListener("load", function(){
     click(doc, '.tabbar [data-tab="track"]');  assertScreen(doc, "s-track", "tab→追蹤");
     click(doc, '.tabbar [data-tab="settings"]'); assertScreen(doc, "s-settings", "tab→設定");
     click(doc, '.tabbar [data-tab="calc"]');   assertScreen(doc, "s-result-etf", "tab→試算(ETF)");
+    var curOk = doc.querySelector('.tabbar [data-tab="calc"]').getAttribute("aria-current") === "page"
+      && !doc.querySelector('.tabbar [data-tab="track"]').hasAttribute("aria-current");
+    results.push((curOk ? "PASS" : "FAIL") + " tabbar 當前頁 aria-current=\"page\"、其餘無屬性");
     /* wishAge 提醒:預設 60(黃金值 58≤60)不顯示;簡單模式也要能看見並可達 s-fail */
     var wn = doc.getElementById("wishNotice");
     var wnHidden = wn.hidden && doc.defaultView.getComputedStyle(wn).display === "none";
@@ -59,6 +65,10 @@ document.getElementById("f").addEventListener("load", function(){
     adv.dispatchEvent(new Event("change", {bubbles: true}));
     assertScreen(doc, "s-result-etf", "投入過低不自動跳頁(WCAG 3.2.2)");
     results.push((!wn.hidden ? "PASS" : "FAIL") + " 低投入→進階模式就地顯示提醒");
+    /* a11y:滑桿 change 後,SR 摘要 live region 反映定值(input 不轟炸) */
+    var lr = doc.getElementById("liveResult");
+    results.push((lr && lr.getAttribute("aria-live") === "polite" && lr.textContent.indexOf("P50") >= 0 ? "PASS" : "FAIL")
+      + " aria-live 結果摘要於 change 後更新");
     click(doc, "#wishNoticeGo");               assertScreen(doc, "s-fail", "提醒連結→無法達標(進階模式)");
     click(doc, '#s-fail [data-go="s-invest"]'); assertScreen(doc, "s-invest", "無法達標→調整計畫");
     /* v0.8 新畫面與動態接線 */
