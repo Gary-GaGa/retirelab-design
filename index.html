@@ -407,7 +407,7 @@ footer.demo-foot{
                 <div class="row total"><span class="k">要自己準備的缺口</span><span class="v" id="gapOut">NT$ 50,000<small>/月</small></span></div>
               </div>
               <p class="caption" id="gapDeductNote">已先扣掉勞保+勞退估算 NT$ 27,500/月,點下方可調整或歸零。</p>
-              <details class="fold">
+              <details class="fold" id="gapFold">
               <summary>政府給付與提領率(預設值可直接用)</summary>
               <div class="fold-body">
                 <p class="caption" style="margin:4px 0 8px">退休金三層:勞保、勞退、自己準備。前兩層的估算已從你的支出扣除,剩下的缺口才是這個 App 幫你算的。覺得估太多?可以調低或設為 0。</p>
@@ -456,6 +456,7 @@ footer.demo-foot{
               <p class="lead">缺口換算後,你需要準備</p>
               <div class="figure mono" id="goalHero" style="font-size:40px;white-space:nowrap">NT$ 1,500<span class="unit">萬</span></div>
               <p class="caption" id="goalFormula">= 每月缺口 50,000 元 ÷ 提領率 4% × 12 個月</p>
+              <p class="caption" id="goalSwrGloss">提領率=退休後每年從資產提領的比例,常見 3–5%;可在上一步的摺疊區調整。</p>
             </div>
             <div class="card ledger">
               <div id="goalGapRows">
@@ -560,7 +561,7 @@ footer.demo-foot{
             <div class="hero">
               <p class="lead">你可以在</p>
               <div class="figure mono" id="etfHero">58<span class="unit">歲</span><span class="verb">退休</span></div>
-              <p class="caption">以 中位 P50數估算 — 依歷史樣本,約有一半的情境能在此之前達標。</p>
+              <p class="caption">以中位數(P50)估算 — 依歷史樣本,約有一半的情境能在此之前達標。</p>
             </div>
 
             <div class="card chart-card">
@@ -680,6 +681,8 @@ footer.demo-foot{
               <div class="rb-title">個股風險揭露</div>
               單一個股沒有分散,歷史也不代表未來。此頁不提供機率區間 — 因為對單一公司,我們算不出誠實的機率。集中持股可能大幅偏離任何假設,請自行評估。
             </div>
+
+            <p class="caption">資料來源:合成示範資料 · 實質報酬試算(通膨 2%/年)· 單一假設試算,非未來報酬之保證。 <button class="link" data-go="s-method" style="font-size:inherit">方法與資料來源 →</button></p>
           </div>
         </section>
 
@@ -714,6 +717,7 @@ footer.demo-foot{
               <div class="row"><span class="k" id="failR2Label">延後退休 6 年</span><span class="v" id="failR2">65 歲<small>達標</small></span></div>
               <div class="row"><span class="k">月支出降 5,000</span><span class="v" id="failR3">59 歲<small>達標</small></span></div>
             </div>
+            <p class="caption">資料來源:合成示範資料 · 實質報酬試算(通膨 2%/年)· P10–P90 為歷史區間,非未來機率保證。 <button class="link" data-go="s-method" style="font-size:inherit">方法與資料來源 →</button></p>
             <div class="btn-row"><button class="btn primary" data-go="s-invest">調整計畫</button></div>
           </div>
         </section>
@@ -729,7 +733,7 @@ footer.demo-foot{
             <div class="hero">
               <p class="lead">目前進度</p>
               <div class="figure mono" style="font-size:44px" id="trackVal">NT$ —</div>
-              <p class="caption" id="trackNote">進度來自帳本市值(F-12 進度整合)。</p>
+              <p class="caption" id="trackNote">進度來自帳本市值。</p>
             </div>
             <div class="card chart-card">
               <svg viewBox="0 0 340 120" role="img" aria-label="實際累積對照試算軌跡">
@@ -773,7 +777,7 @@ footer.demo-foot{
                   <div class="row"><span class="k">年化報酬(XIRR)</span><span class="v mono" id="lgXirr">—</span></div>
                   <div class="row"><span class="k">計畫假設(年化,實質)</span><span class="v mono" id="lgPlan">—</span></div>
                 </div>
-                <p class="caption">XIRR=把投入時間也算進去的年化報酬。三數字口徑不同(總報酬/年化),不可直接互比。</p>
+                <p class="caption">XIRR=把投入時間也算進去的年化報酬。三個數字的統計基準不同(總報酬/年化),不可直接互比。</p>
                 <div class="section-label">已實現與配息</div>
                 <div class="card ledger">
                   <div class="row"><span class="k">已實現損益(不含配息)</span><span class="v mono" id="lgRealized">—</span></div>
@@ -794,16 +798,17 @@ footer.demo-foot{
               <div class="row field-row"><span class="k">股數</span><input type="number" id="holdShares" min="1" step="1" value="1000" aria-label="股數"></div>
               <div class="row field-row"><span class="k">每股買進均價</span><input type="number" id="holdCost" min="0.01" step="0.1" value="120" aria-label="每股買進均價"></div>
               <div class="row field-row"><span class="k">目前現價(手動)</span><input type="number" id="holdPrice" min="0.01" step="0.1" value="132" aria-label="目前現價"></div>
+              <p class="caption" id="holdErr" role="alert" style="color:var(--err)" hidden></p>
               <div class="btn-row" style="padding:8px 0 4px"><button class="btn primary" id="holdAdd">加入帳本</button></div>
                 </div>
-                <p class="caption">現價為手動輸入,非即時行情(Q2 前無行情源);以買進均價入帳,手續費由引擎另計(與明細頁加碼同口徑),平均成本法併入持股,並可作為試算起點(投入頁切換)。單筆交易明細移至各持股頁。</p>
+                <p class="caption">現價需手動輸入,目前沒有即時行情。持股以買進均價入帳,手續費會自動另計,算法與明細頁加碼相同。多次買進以平均成本法併入同一檔。加入後可在「投入計畫」頁切換為試算起點。單筆交易明細請到各持股頁查看。</p>
               </div>
             </details>
             <details class="fold">
-              <summary>配息自動生成(示意,F-17)</summary>
+              <summary>配息自動生成(示意)</summary>
               <div class="fold-body">
                 <div class="card ledger" id="lgAutoDiv"></div>
-                <p class="caption">依持股 × 除息事件自動代入現金股利,可編輯後入帳;正式功能依賴 Q2 資料授權之公司行動事件庫,本區為合成事件示意。</p>
+                <p class="caption">依持股 × 除息事件自動代入現金股利,可編輯後入帳。此區以合成事件示意;正式版將接上真實的除息公告資料。</p>
               </div>
             </details>
           </div>
@@ -835,10 +840,11 @@ footer.demo-foot{
 
             <div class="section-label" style="margin-top:8px">試算參數</div>
             <div class="card ledger">
-              <div class="row"><span class="k">提領率</span><span class="v" id="setSwr">4.0%</span></div>
-              <div class="row"><span class="k">退休後月支出</span><span class="v" id="setExp">NT$ 77,500</span></div>
-              <div class="row"><span class="k">勞保/勞退覆蓋</span><span class="v" id="setPension">NT$ 27,500<small>/月</small></span></div>
+              <button class="row holding-row" data-go="s-gap" data-reveal="gapFold"><span class="k">提領率</span><span class="v"><span id="setSwr">4.0%</span> →</span></button>
+              <button class="row holding-row" data-go="s-gap"><span class="k">退休後月支出</span><span class="v"><span id="setExp">NT$ 77,500</span> →</span></button>
+              <button class="row holding-row" data-go="s-gap" data-reveal="gapFold"><span class="k">勞保/勞退覆蓋</span><span class="v"><span id="setPension">NT$ 27,500<small>/月</small></span> →</span></button>
             </div>
+            <p class="set-note">點任一列可回「缺口引導」調整,結果會即時重算。</p>
 
             <div class="section-label" style="margin-top:8px">外觀</div>
             <div class="card ledger">
@@ -938,11 +944,11 @@ footer.demo-foot{
         <section class="screen" id="s-compare" data-name="標的比較">
           <div class="appbar"><button class="link" data-go="s-result-etf">← 試算</button><span class="title" style="margin-left:8px">標的比較</span><span class="spacer"></span><span class="chip">ETF 型</span></div>
           <div class="body">
-            <p style="font-size:15px">相同投入、年齡與稅費假設下,兩檔 ETF 的達標時間對照。口徑相同,僅歷史樣本不同。</p>
+            <p style="font-size:15px">相同投入、年齡與稅費假設下,兩檔 ETF 的達標時間對照。計算方式完全相同,僅歷史樣本不同。</p>
             <div class="card ledger" id="cmpTable"></div>
             <p class="caption">同參數對照,非優劣排序;歷史樣本不代表未來,兩檔樣本期間長度不同(0050:276 月/0056:216 月)。殖利率假設一律 3%(示範),高股息型實際稅費 drag 會更高。</p>
             <div class="section-label">個股?</div>
-            <p class="caption">個股僅提供確定性試算(單一假設),與 ETF 機率區間口徑不同,不納入本頁對照。</p>
+            <p class="caption">個股僅提供確定性試算(單一假設),計算方式與 ETF 的機率區間不同,不納入本頁對照。</p>
             <div class="btn-row"><button class="btn ghost" data-go="s-decum">查看提領期(概念)→</button></div>
           </div>
         </section>
@@ -954,7 +960,7 @@ footer.demo-foot{
             <div class="hero">
               <p class="lead">退休後每月提領 <span class="mono" id="decumWOut">NT$ 50,000</span>,約一半的歷史情境能支應到</p>
               <div class="figure mono" id="decumHero">—<span class="unit">歲</span></div>
-              <p class="caption">以 中位 P50數估算 — 歷史條件下的分佈,非未來機率之保證。月提領為今日購買力(實質)。</p>
+              <p class="caption">以中位數(P50)估算 — 歷史條件下的分佈,非未來機率之保證。月提領為今日購買力(實質)。</p>
             </div>
             <div class="card chart-card">
               <svg viewBox="0 0 340 150" role="img" aria-label="提領期存摺線:退休日後餘額走勢區間,單色綠扇形向下收斂">
@@ -987,7 +993,7 @@ footer.demo-foot{
               <div class="row"><span class="k">中位</span><span class="v mono" id="decumP50">—</span></div>
               <div class="row total"><span class="k">樂觀(90% 情境在此之前用罄)</span><span class="v mono" id="decumP90">—</span></div>
             </div>
-            <p class="caption" id="decumStartNote">v2.0 概念驗證(F-22):僅 ETF 類適用;歸零 = 資產用罄;100+ 表示 60 年模擬期內未用罄。</p>
+            <p class="caption" id="decumStartNote">未來功能預覽,僅適用 ETF 類;「用罄」= 資產歸零;100+ 表示 60 年模擬期內未用罄。</p>
           </div>
         </section>
 
@@ -1021,7 +1027,7 @@ footer.demo-foot{
               <div class="row field-row"><span class="k">減碼股數</span><input type="number" id="hdSellShares" min="0" step="1" value="0" aria-label="減碼股數"></div>
               <div class="btn-row" style="padding:8px 0 4px"><button class="btn primary" id="hdApply">套用調整</button></div>
             </div>
-            <p class="caption" id="hdMsg">現價變更即時重算;加碼以現價買進(含手續費),減碼以現價賣出(含手續費與證交稅)。</p>
+            <p class="caption" id="hdMsg" aria-live="polite">現價變更即時重算;加碼以現價買進(含手續費),減碼以現價賣出(含手續費與證交稅)。</p>
             <div class="section-label">本檔交易紀錄(含手續費與證交稅)</div>
             <div class="card ledger" id="hdTxns"></div>
           </div>
@@ -1203,7 +1209,14 @@ footer.demo-foot{
   document.getElementById("phone").addEventListener("click", function(e){
     if (!appMode) return;
     var go = e.target.closest("[data-go]");
-    if (go) { if (go.dataset.go === "s-fail") renderFail(); showById(go.dataset.go); return; }
+    if (go) {
+      if (go.dataset.go === "s-fail") renderFail();
+      if (go.dataset.reveal) { /* 設定列 → 缺口引導:目標控制在摺疊內時,依使用者意圖展開 */
+        var rv = document.getElementById(go.dataset.reveal);
+        if (rv) rv.open = true;
+      }
+      showById(go.dataset.go); return;
+    }
     if (e.target.closest("#startCalc")) {
       var stock = document.getElementById("pickStock").getAttribute("aria-pressed") === "true";
       showById(stock ? "s-result-stock" : "s-result-etf");
@@ -1503,6 +1516,8 @@ footer.demo-foot{
     if (directOut) directOut.textContent = "NT$ " + wan;
     var gapRows = document.getElementById("goalGapRows");
     if (gapRows) gapRows.hidden = direct;
+    var swrGloss = document.getElementById("goalSwrGloss");
+    if (swrGloss) swrGloss.hidden = direct; /* direct 模式公式不含提領率,gloss 一併收起 */
     document.getElementById("gapExpOut").textContent = fmtNT(g.exp);
     document.getElementById("gapLbOut").textContent = fmtNT(Number(document.getElementById("gapLaobao").value));
     document.getElementById("gapLtOut").textContent = fmtNT(Number(document.getElementById("gapLaotui").value));
@@ -1579,7 +1594,7 @@ footer.demo-foot{
     var achieved = SIM && Number.isFinite(SIM.p50Months) ? mAge(SIM.p50Months) : null;
     var retAge = achieved != null ? Math.max(currentAge() + 1, achieved) : Math.max(DEMO.wishAge, currentAge() + 1);
     var startNote = document.getElementById("decumStartNote");
-    if (startNote) startNote.textContent = "v2.0 概念驗證(F-22):僅 ETF 類適用;歸零 = 資產用罄;100+ 表示 60 年模擬期內未用罄。自 " + Math.round(retAge) + " 歲(P50 達標年齡)退休起算。";
+    if (startNote) startNote.textContent = "未來功能預覽,僅適用 ETF 類;「用罄」= 資產歸零;100+ 表示 60 年模擬期內未用罄。自 " + Math.round(retAge) + " 歲(中位數 P50 達標年齡)退休起算。";
     var dAge = function(mo){
       if (!Number.isFinite(mo)) return "100+";
       var a = retAge + mo / 12;
@@ -1622,7 +1637,9 @@ footer.demo-foot{
     currentHolding = sym;
     document.getElementById("hdBuyShares").value = 0;
     document.getElementById("hdSellShares").value = 0;
-    document.getElementById("hdMsg").textContent = "現價變更即時重算;加碼以現價買進(含手續費),減碼以現價賣出(含手續費與證交稅)。";
+    var hdMsg0 = document.getElementById("hdMsg");
+    hdMsg0.style.color = "";
+    hdMsg0.textContent = "現價變更即時重算;加碼以現價買進(含手續費),減碼以現價賣出(含手續費與證交稅)。";
     renderHolding();
     showById("s-holding");
   }
@@ -1667,7 +1684,7 @@ footer.demo-foot{
       var buy = Number(document.getElementById("hdBuyShares").value);
       var sell = Number(document.getElementById("hdSellShares").value);
       var msg = document.getElementById("hdMsg");
-      if (!(price > 0)) { msg.textContent = "現價需大於 0。"; return; }
+      if (!(price > 0)) { msg.style.color = "var(--err)"; msg.textContent = "調整未套用:現價需大於 0。"; return; }
       LEDGER_PRICES[sym] = price;
       var added = 0;
       if (buy > 0) { USER_TXNS.push({ date: "2026-07-20", symbol: sym, assetClass: meta.assetClass || "etf", type: "buy", shares: buy, price: price }); added++; }
@@ -1676,9 +1693,18 @@ footer.demo-foot{
         E.buildLedgerSnapshot(allTxns(), { brokerFeeDiscount: 0.6 }); /* 賣超防護:交由引擎驗證 */
       } catch (err) {
         while (added-- > 0) USER_TXNS.pop();
-        msg.textContent = "調整未套用:" + err.message;
+        msg.style.color = "var(--err)";
+        if (sell > 0) { /* 引擎丟出的賣超錯誤 → 換成白話+可行上限(引擎仍是唯一驗證者) */
+          var snapNow = E.buildLedgerSnapshot(allTxns(), { brokerFeeDiscount: 0.6 });
+          var held = snapNow.holdings.get(sym);
+          var maxSell = Math.max(0, Math.floor((held ? held.shares : 0) + (buy > 0 ? buy : 0)));
+          msg.textContent = "調整未套用:持股不足,無法減碼 " + sell.toLocaleString("en-US") + " 股 — 目前最多可減碼 " + maxSell.toLocaleString("en-US") + " 股。";
+        } else {
+          msg.textContent = "調整未套用:輸入的數字無法計算,請檢查後再試一次。";
+        }
         return;
       }
+      msg.style.color = "";
       msg.textContent = "已套用。加碼含手續費、減碼含手續費與證交稅,損益已即時更新。";
       document.getElementById("hdBuyShares").value = 0;
       document.getElementById("hdSellShares").value = 0;
@@ -1701,7 +1727,7 @@ footer.demo-foot{
     { s: "s-target", t: "兩種標的,兩種誠實:ETF 給機率,個股只給單一假設。" },
     { s: "s-result-stock", t: "個股頁沒有機率語句 — 對單一公司,我們算不出誠實的機率。" },
     { s: "s-fail", t: "誠實的極致:做不到就說做不到,並給三條路,每條都重新試算過。" },
-    { s: "s-compare", t: "同參數下兩檔 ETF 的對照 — 口徑相同、非優劣排序,差異只來自歷史樣本。" },
+    { s: "s-compare", t: "同參數下兩檔 ETF 的對照 — 計算方式相同、非優劣排序,差異只來自歷史樣本。" },
     { s: "s-ledger", t: "留存主賭注:交易帳本 — 配置圖依市值一眼看懂,點任一列進單檔明細。" },
     { s: "s-holding", t: "單檔明細:市值、均價、已實現/未實現、年配息,可改現價與加減碼 — 賣超由引擎擋下。" },
     { s: "s-decum", t: "更遠的方向:從『幾歲退休』到『錢夠花到幾歲』— 提領期自你的達標年齡起算。" },
@@ -1786,7 +1812,20 @@ footer.demo-foot{
       var shares = Number(document.getElementById("holdShares").value);
       var cost = Number(document.getElementById("holdCost").value);
       var price = Number(document.getElementById("holdPrice").value);
-      if (!meta || !(shares > 0) || !(cost > 0) || !(price > 0)) return;
+      /* 無效輸入不再靜默:就地指出哪個欄位要修 */
+      var errEl = document.getElementById("holdErr");
+      var bad = [];
+      if (!(shares > 0)) bad.push("股數");
+      if (!(cost > 0)) bad.push("每股買進均價");
+      if (!(price > 0)) bad.push("目前現價");
+      if (!meta || bad.length) {
+        errEl.textContent = !meta
+          ? "還沒加入:請先選一個標的。"
+          : "還沒加入:「" + bad.join("」「") + "」需要大於 0 的數字。";
+        errEl.hidden = false;
+        return;
+      }
+      errEl.hidden = true;
       /* 買進均價入帳,手續費由引擎另計(與明細頁加碼同口徑) */
       USER_TXNS.push({ date: "2026-07-20", symbol: sym, assetClass: meta.assetClass, type: "buy", shares: shares, price: cost });
       LEDGER_PRICES[sym] = price;
@@ -1858,7 +1897,7 @@ footer.demo-foot{
     var target = currentTarget();
     var pct = target > 0 ? (mv / target * 100).toFixed(1) : "0";
     el.textContent = fmtNT(mv);
-    document.getElementById("trackNote").textContent = "進度來自帳本市值(F-12 進度整合)— 已達目標 " + pct + "%。";
+    document.getElementById("trackNote").textContent = "進度來自帳本市值 — 已達目標 " + pct + "%。";
     var invested = 0;
     allTxns().forEach(function(t){ var cf = E.transactionCashFlow(t, cfg); if (cf < 0) invested += -cf; });
     var rows = "";
