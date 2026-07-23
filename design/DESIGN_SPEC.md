@@ -3,11 +3,23 @@
 Status: FROZEN
 Author: design-director
 Date: 2026-07-19
-Iteration: 1
+Iteration: 2
 
 This file is a contract. Implementers derive every visual value from it and may
 not introduce colors, fonts, or motion outside it. Changing it is a
 design-director action gated by the outer loop, never an implementer action.
+
+## Changelog
+
+- 2026-07-23 (Iteration 2, gated amendment — Status stays FROZEN): Added
+  dark-mode-only token **A2D `lamp-green-deep` #2E8168** for the P10 band edge.
+  Fixes a confirmed contrast defect: the prior §3 note reused **A2 #0A3B30** as
+  the dark-mode P10 edge, but A2 on SURFD `card-ink` #12201B measures ≈**1.35:1**
+  — below the WCAG 3:1 graphics floor, i.e. the conservative lower-bound line is
+  invisible on dark (screenshot-confirmed). A2 is a *light-mode-only* deep step;
+  on a dark ground the pessimistic edge must be a **dimmer green than P50**, not a
+  darker one. This amendment is scoped strictly to that one token decision; no
+  other design value changed. Not an unfreeze — a gated correction.
 
 ---
 
@@ -36,7 +48,7 @@ Why A wins: the 存摺 is a distinctly Taiwanese financial artifact (fails a US 
 ## 3. Tokens (machine-readable — audit_tokens.py parses this block)
 
 <!-- TOKENS:BEGIN
-colors: #0E5C48, #0A3B30, #6FB39B, #F1F4F0, #FFFFFF, #16211C, #D4DAD3, #B0741A, #F6ECD8, #B23A2E, #0C1512, #12201B, #E7EDE9, #3AA886, #26332D
+colors: #0E5C48, #0A3B30, #6FB39B, #F1F4F0, #FFFFFF, #16211C, #D4DAD3, #B0741A, #F6ECD8, #B23A2E, #0C1512, #12201B, #E7EDE9, #3AA886, #26332D, #2E8168
 fonts: "Space Mono", "PingFang TC", "Noto Sans TC"
 allow-extra: transparent, currentColor
 TOKENS:END -->
@@ -48,7 +60,7 @@ Human-readable rationale:
 | Token | Value | Role | Why (tie to subject) |
 |-------|-------|------|----------------------|
 | A1 `passbook-green` | #0E5C48 | primary accent · **P50 median** | The 存摺 cover / prior-art mark green, deliberately deepened; institutional, not a "market up" color. |
-| A2 `ledger-green-deep` | #0A3B30 | **P10 lower bound** · deep type on green | Darkest step of the single-hue uncertainty band — the pessimistic edge reads as "more ink, less light." |
+| A2 `ledger-green-deep` | #0A3B30 | **P10 lower bound (light only)** · deep type on green | Darkest step of the single-hue uncertainty band — the pessimistic edge reads as "more ink, less light." Light-mode only: on a dark ground it collapses below the contrast floor (see dark-band note + A2D). |
 | C90 `band-green-light` | #6FB39B | **P90 upper bound** · fan tint | Lightest step of the same hue — optimistic edge; one hue = one honest quantity, never a second category. |
 | N1 `passbook-paper` | #F1F4F0 | page background (light) | Cool green-grey passbook stock. Explicitly **not** cream (see §7 / T2-01). |
 | SURF `card-paper` | #FFFFFF | raised card / ledger sheet | Clean printed sheet lifted off the paper page. |
@@ -71,9 +83,10 @@ Human-readable rationale:
 | SURFD `card-ink` | #12201B | raised card (dark) | Barely-lifted surface, keeps flat ledger feel. |
 | N2D `paper-fg` | #E7EDE9 | foreground text (dark) | Warm paper-white ink on dark. |
 | A1D `green-lamp` | #3AA886 | primary accent · P50 (dark) | Brightened passbook green for AA on dark — muted, never acid (§7 / T2-02). |
+| A2D `lamp-green-deep` | #2E8168 | **P10 lower bound (dark only)** · pessimistic band edge | The dimmed passbook lamp: same hue as A1D (≈162°), same saturation family, but ~1.8× less luminous — so it reads as the conservative "more ink, less light" edge, not a second accent. On dark, the pessimistic step must be a *dimmer* green than P50, not a darker one (a darker green vanishes into the ground). Clears the 3:1 graphics floor on both dark grounds: **3.57:1** on SURFD #12201B, **3.94:1** on N1D #0C1512. |
 | N3D `rule-dark` | #26332D | hairline rules (dark) | Ledger rules on dark. |
 
-Dark-mode band: P90 = A1D lightened via opacity on SURFD; P10 = A2 (#0A3B30) reads as the deep edge on dark. WARN/WARN-BG/ERR carry across both modes (amber/red keep meaning in either).
+Dark-mode band: P90 = A1D lightened via opacity on SURFD; **P10 = A2D `lamp-green-deep` #2E8168** — a dimmed same-hue green that reads as the pessimistic "more ink, less light" edge while clearing the 3:1 graphics floor on both dark grounds (3.57:1 on SURFD, 3.94:1 on N1D). A2 #0A3B30 is the light-mode-only deep step and **must not** be reused on dark: there it measures ≈1.35:1 on SURFD and the conservative lower-bound line disappears. WARN/WARN-BG/ERR carry across both modes (amber/red keep meaning in either).
 
 **Type:**
 
@@ -121,6 +134,8 @@ Concept (one sentence): A single-column passbook page — a running ledger of wh
 |  P10–P90 非未來機率保證                       |
 +----------------------------------------------+
 ```
+
+Note: the ASCII fork above depicts the **light-mode** fork (P10 = A2 #0A3B30 on paper). In dark mode the P10 stroke uses **A2D #2E8168** (see §3 dark-band note); everything else in the layout is mode-agnostic.
 
 Individual-stock variant: identical shell, but the balance line stays a **single printed line** past 「今天」 (no fork), a 「確定性試算」stamp sits at the top-right instead of 「ETF 型」, and the P90/P50/P10 cards are replaced by one figure + the amber risk block (WARN / WARN-BG). The absence of the fork is the honest signal: no probability, so no band.
 
