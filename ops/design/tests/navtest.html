@@ -176,6 +176,32 @@ document.getElementById("f").addEventListener("load", function(){
     var asofOk = doc.getElementById("trackAsof").textContent === doc.getElementById("lgAsof").textContent
       && doc.getElementById("trackAsof").textContent.indexOf("更新於") === 0;
     results.push((asofOk ? "PASS" : "FAIL") + " 追蹤/帳本「更新於」單一來源一致");
+    /* clarify 輪:結果頁前提列(存在+動態)、滑桿 aria-valuetext、theme switch 狀態語意、s4–s6 進度條、output[for] */
+    var pm = doc.getElementById("etfPremise");
+    var iv = doc.getElementById("investRange");
+    iv.value = 15000; iv.dispatchEvent(new Event("input", {bubbles: true})); /* 回到預設投入(前段進階測試曾降到 6,000) */
+    var pmOk = pm && pm.textContent.indexOf("1,500") >= 0 && pm.textContent.indexOf("15,000") >= 0 && pm.textContent.indexOf("35") >= 0;
+    results.push((pmOk ? "PASS" : "FAIL") + " 結果頁前提列存在(目標 1,500 萬 · 月投入 15,000 · 35 歲起算)");
+    iv.value = 20000; iv.dispatchEvent(new Event("input", {bubbles: true}));
+    results.push((pm && pm.textContent.indexOf("20,000") >= 0 ? "PASS" : "FAIL") + " 前提列隨投入滑桿動態更新(15,000→20,000)");
+    results.push((iv.getAttribute("aria-valuetext") === "NT$ 20,000" ? "PASS" : "FAIL") + " 滑桿 aria-valuetext=格式化值(NT$ 20,000)");
+    iv.value = 15000; iv.dispatchEvent(new Event("input", {bubbles: true}));
+    iv.dispatchEvent(new Event("change", {bubbles: true}));
+    var ofN = doc.querySelectorAll("output[for]").length;
+    results.push((ofN === 11 ? "PASS" : "FAIL") + " output[for] 原生關聯 11 個滑桿(實得 " + ofN + ")");
+    var tb2 = doc.getElementById("themeToggle");
+    var thOk = tb2.getAttribute("role") === "switch" && tb2.getAttribute("aria-checked") === "false";
+    tb2.click();
+    thOk = thOk && tb2.getAttribute("aria-checked") === "true" && doc.documentElement.getAttribute("data-theme") === "dark";
+    tb2.click();
+    thOk = thOk && tb2.getAttribute("aria-checked") === "false";
+    results.push((thOk ? "PASS" : "FAIL") + " 主題切換 role=switch:aria-checked 隨深色狀態往返翻轉");
+    ["s-goal", "s-invest", "s-target"].forEach(function(id, i){
+      var st = doc.querySelector("#" + id + " .steps");
+      var onN = st ? st.querySelectorAll("i.on").length : 0;
+      var okS = st && st.querySelectorAll("i").length === 4 && onN === i + 2 && !doc.querySelector("#" + id + " .appbar .caption");
+      results.push((okS ? "PASS" : "FAIL") + " " + id + " 進度條 .steps(" + (i + 2) + "/4 亮起,appbar 分數已移除)");
+    });
     var pass = results.filter(function(r){ return r.indexOf("FAIL") === 0; }).length === 0;
     document.getElementById("out").textContent =
       "NAVTEST " + (pass ? "ALL-PASS" : "HAS-FAIL") + "\n" + results.join("\n");
