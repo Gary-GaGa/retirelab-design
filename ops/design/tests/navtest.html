@@ -23,10 +23,19 @@ document.getElementById("f").addEventListener("load", function(){
     assertScreen(doc, "s-disclaimer", "載入自動推進");
     click(doc, '[data-go="s-gap"]');           assertScreen(doc, "s-gap", "免責→缺口引導");
     click(doc, '[data-go="s-goal"]');          assertScreen(doc, "s-goal", "引導→目標");
+    /* Onboarding 返回路徑:appbar「← 上一步」沿用 s15–s17 pattern */
+    click(doc, '#s-goal .appbar [data-go="s-gap"]'); assertScreen(doc, "s-gap", "目標←上一步→引導");
+    click(doc, '#s-gap .appbar [data-go="s-disclaimer"]'); assertScreen(doc, "s-disclaimer", "引導←上一步→免責");
+    click(doc, '[data-go="s-gap"]');
+    click(doc, '[data-go="s-goal"]');          assertScreen(doc, "s-goal", "引導→目標(返回後再前進)");
     var wr = doc.getElementById("wishRange");
     results.push((wr && wr.value === "60" ? "PASS" : "FAIL") + " 目標頁「希望幾歲前退休」輸入存在且預設 60");
     click(doc, '[data-go="s-invest"]');        assertScreen(doc, "s-invest", "目標→投入");
+    click(doc, '#s-invest .appbar [data-go="s-goal"]'); assertScreen(doc, "s-goal", "投入←上一步→目標");
+    click(doc, '[data-go="s-invest"]');
     click(doc, '[data-go="s-target"]');        assertScreen(doc, "s-target", "投入→標的");
+    click(doc, '#s-target .appbar [data-go="s-invest"]'); assertScreen(doc, "s-invest", "標的←上一步→投入");
+    click(doc, '[data-go="s-target"]');        assertScreen(doc, "s-target", "投入→標的(返回後再前進)");
     click(doc, "#pickStock");
     click(doc, "#startCalc");                  assertScreen(doc, "s-result-stock", "個股→確定性結果");
     var tabbarVisible = doc.querySelector(".tabbar").style.display !== "none";
@@ -61,15 +70,22 @@ document.getElementById("f").addEventListener("load", function(){
     wr.value = 55; wr.dispatchEvent(new Event("input", {bubbles: true}));
     results.push((!wn.hidden ? "PASS" : "FAIL") + " 希望 55 歲(<P50)→ 簡單模式就地顯示提醒");
     click(doc, "#wishNoticeGo");               assertScreen(doc, "s-fail", "提醒連結→無法達標(簡單模式)");
-    var faOk = doc.getElementById("failAge").textContent.indexOf("55") >= 0 && doc.getElementById("failDemoNote").hidden;
-    results.push((faOk ? "PASS" : "FAIL") + " 無法達標頁反映使用者選的 55 歲(真實缺口,非示範狀態)");
+    var faOk = doc.getElementById("failAge").textContent.indexOf("55") >= 0 && doc.getElementById("failDemoNote").hidden
+      && doc.getElementById("failDemoHero").hidden && !doc.getElementById("failRealHero").hidden;
+    results.push((faOk ? "PASS" : "FAIL") + " 無法達標頁反映使用者選的 55 歲(真實缺口版面,非示範狀態)");
     click(doc, '#s-fail [data-go="s-invest"]'); assertScreen(doc, "s-invest", "無法達標→調整計畫");
     wr.value = 60; wr.dispatchEvent(new Event("input", {bubbles: true}));
-    /* s-fail 預設(可達標)入口:明標示範狀態,不顯示自相矛盾的「差 0 萬」宣判 */
+    /* s-fail 預設(可達標)入口:真話先行 — hero 講事實(60 歲前可達標),what-if 降為明標示範區塊 */
     click(doc, 'nav.screens ol li:nth-child(9) button'); assertScreen(doc, "s-fail", "側欄→無法達標(可達標情境)");
+    var dh = doc.getElementById("failDemoHero");
+    var dhOk = dh && !dh.hidden && dh.textContent.indexOf("60") >= 0 && dh.textContent.indexOf("可達標") >= 0
+      && dh.textContent.indexOf("58") >= 0;
+    results.push((dhOk ? "PASS" : "FAIL") + " 可達標情境 → 真話先行 hero(希望 60 歲前可達標、中位 58)");
+    results.push((doc.getElementById("failRealHero").hidden ? "PASS" : "FAIL") + " 可達標情境 → 缺口宣判 hero 隱藏");
     var dn = doc.getElementById("failDemoNote");
-    var dnOk = dn && !dn.hidden && dn.textContent.indexOf("示範狀態") >= 0 && dn.textContent.indexOf("60 歲前可達標") >= 0;
-    results.push((dnOk ? "PASS" : "FAIL") + " 預設達標情境 → 示範狀態標示(假設年齡+60 歲前可達標)");
+    var wl = doc.getElementById("failWhatIfLabel");
+    var dnOk = wl && !wl.hidden && dn && !dn.hidden && dn.textContent.indexOf("示範") >= 0 && dn.textContent.indexOf("假設希望") >= 0;
+    results.push((dnOk ? "PASS" : "FAIL") + " what-if 降為明標示範區塊(標題+假設說明+缺口數字)");
     click(doc, '.tabbar [data-tab="calc"]');   assertScreen(doc, "s-result-etf", "tab→試算(回結果頁)");
     click(doc, "#modeAdv"); /* 切到進階模式 */
     var adv = doc.getElementById("advRange");
@@ -151,6 +167,15 @@ document.getElementById("f").addEventListener("load", function(){
     click(doc, "#modeGap");
     var backOk = doc.getElementById("goalTarget").textContent.indexOf("15,000,000") >= 0;
     results.push((backOk ? "PASS" : "FAIL") + " 切回現金流推算→目標還原");
+    /* 合成資料標示第二層:提領期/比較(MC 口徑含 P10–P90 caveat)、追蹤(實際 vs 模擬分明) */
+    var synth = function(id){ var s = doc.getElementById(id); return s && s.textContent.indexOf("合成示範資料") >= 0; };
+    results.push((synth("s-compare") && doc.getElementById("s-compare").textContent.indexOf("非未來機率保證") >= 0 ? "PASS" : "FAIL") + " 標的比較頁合成資料標示(含 P10–P90 caveat)");
+    results.push((synth("s-decum") && doc.getElementById("s-decum").textContent.indexOf("非未來機率保證") >= 0 ? "PASS" : "FAIL") + " 提領期頁合成資料標示(含 P10–P90 caveat)");
+    results.push((synth("s-track") && doc.getElementById("s-track").textContent.indexOf("帳本實際紀錄") >= 0 ? "PASS" : "FAIL") + " 追蹤頁軌跡帶標示為模擬、進度標示為帳本實際");
+    /* 同源日期:追蹤/帳本「更新於」皆由 LEDGER_ASOF 導出 */
+    var asofOk = doc.getElementById("trackAsof").textContent === doc.getElementById("lgAsof").textContent
+      && doc.getElementById("trackAsof").textContent.indexOf("更新於") === 0;
+    results.push((asofOk ? "PASS" : "FAIL") + " 追蹤/帳本「更新於」單一來源一致");
     var pass = results.filter(function(r){ return r.indexOf("FAIL") === 0; }).length === 0;
     document.getElementById("out").textContent =
       "NAVTEST " + (pass ? "ALL-PASS" : "HAS-FAIL") + "\n" + results.join("\n");

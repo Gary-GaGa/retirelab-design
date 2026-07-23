@@ -41,6 +41,7 @@
   --ink-faint:#E7EDE9A6;
   --rule:#26332D;         /* N3D rule-dark */
   --a1:#3AA886;           /* A1D green-lamp · P50 */
+  --a2:#2E8168;           /* A2D lamp-green-deep · P10(深色專用:A2 #0A3B30 於 SURFD 僅 1.35:1,spec §3 Iteration 2)*/
   --band:#3AA88640;       /* A1D @25% fan fill on dark */
   --a1-wash:#3AA8861F;
   --btn-fg:#0C1512;
@@ -155,6 +156,7 @@ nav.screens button[aria-current="true"] .no{color:var(--a1)}
 .row .v small{font-family:var(--sans);color:var(--ink-faint);font-size:11px;margin-left:4px}
 .row.total .k{color:var(--ink);font-weight:600}
 .row.total .v{font-weight:700;color:var(--a1)}
+.row.total.pl .v{color:var(--ink)} /* 損益類 total:方向由 +/− 表達,不著品牌綠(綠≠漲跌,紅綠禁令的同一精神)*/
 .link{color:var(--a1);font-size:13px;font-weight:600;text-decoration:underline;text-underline-offset:2px}
 .row .link,.appbar .link{text-decoration:none} /* 列/appbar 位置本身已有 affordance,底線留給 hover;caption 內連結恆有底線 */
 .row .link:hover,.appbar .link:hover{text-decoration:underline}
@@ -217,7 +219,7 @@ nav.screens button[aria-current="true"] .no{color:var(--a1)}
 .lab-p50{fill:var(--a1)}
 .lab-p10{fill:var(--a2)}
 [data-theme="dark"] .lab-p90{fill:var(--c90)} /* C90 於深色 surf 6.9:1,恢復 band 色 */
-[data-theme="dark"] .lab-p10{fill:var(--ink-faint)}
+[data-theme="dark"] .lab-p10{fill:var(--ink-faint)} /* A2D 3.57:1 過圖形線(線/卡沿用 --a2 覆寫),10px 文字需 4.5:1 → 錨定中性墨(同 light lab-p90 手法)*/
 .chart-legend{display:flex;gap:14px;padding:6px 6px 10px;font-size:11.5px;color:var(--ink-faint);flex-wrap:wrap}
 .chart-legend i{display:inline-block;width:14px;height:3px;border-radius:2px;margin-right:5px;vertical-align:middle}
 
@@ -394,7 +396,7 @@ footer.demo-foot{
 
         <!-- 03 缺口引導 (1/4) ============================================= -->
         <section class="screen" id="s-gap" data-name="缺口引導 1/4">
-          <div class="appbar"><span class="title">你的目標</span></div>
+          <div class="appbar"><button class="link" data-go="s-disclaimer">← 上一步</button><span class="title" style="margin-left:8px">你的目標</span></div>
           <div class="body">
             <div class="steps" aria-label="引導進度 1/4">
               <i class="on"></i><i></i><i></i><i></i><span class="t">1 / 4</span>
@@ -457,7 +459,7 @@ footer.demo-foot{
 
         <!-- 04 目標 ======================================================= -->
         <section class="screen" id="s-goal" data-name="目標">
-          <div class="appbar"><span class="title">目標</span><span class="spacer"></span><span class="caption">2 / 4</span></div>
+          <div class="appbar"><button class="link" data-go="s-gap">← 上一步</button><span class="title" style="margin-left:8px">目標</span><span class="spacer"></span><span class="caption">2 / 4</span></div>
           <div class="body">
             <div class="hero">
               <p class="lead">缺口換算後,你需要準備</p>
@@ -488,7 +490,7 @@ footer.demo-foot{
 
         <!-- 05 投入 ======================================================= -->
         <section class="screen" id="s-invest" data-name="投入">
-          <div class="appbar"><span class="title">投入計畫</span><span class="spacer"></span><span class="caption">3 / 4</span></div>
+          <div class="appbar"><button class="link" data-go="s-goal">← 上一步</button><span class="title" style="margin-left:8px">投入計畫</span><span class="spacer"></span><span class="caption">3 / 4</span></div>
           <div class="body">
             <div class="card ledger">
               <div class="slider-row">
@@ -528,7 +530,7 @@ footer.demo-foot{
 
         <!-- 06 標的 ======================================================= -->
         <section class="screen" id="s-target" data-name="標的">
-          <div class="appbar"><span class="title">選擇標的</span><span class="spacer"></span><span class="caption">4 / 4</span></div>
+          <div class="appbar"><button class="link" data-go="s-invest">← 上一步</button><span class="title" style="margin-left:8px">選擇標的</span><span class="spacer"></span><span class="caption">4 / 4</span></div>
           <div class="body">
             <p style="font-size:15px">兩種標的,兩種誠實:ETF 給你機率,個股只給你單一假設。</p>
 
@@ -728,12 +730,20 @@ footer.demo-foot{
             <span class="chip">ETF 型</span>
           </div>
           <div class="body">
-            <div class="hero">
+            <!-- 真實缺口(希望年齡 < P50):直述缺口,版面不變 -->
+            <div class="hero" id="failRealHero">
               <p class="lead">以目前的計畫,到</p>
               <div class="figure mono" id="failAge">60<span class="unit">歲</span></div>
               <p class="lead">仍差 <strong class="mono" id="failGap">NT$ 633 萬</strong> 才能達標。</p>
             </div>
-            <p class="caption" id="failDemoNote" hidden>示範狀態:假設希望 56 歲前退休(你目前的計畫在 60 歲前可達標)。</p>
+            <!-- 可達標時的示範入口:真話先行 — hero 講事實,what-if 降為下方明標示範區塊 -->
+            <div class="hero" id="failDemoHero" hidden>
+              <p class="lead">你目前的計畫,在希望的</p>
+              <div class="figure mono" id="failOkAge">60<span class="unit">歲</span></div>
+              <p class="lead">前可達標<span id="failOkP50">(中位數 58 歲)</span>。</p>
+            </div>
+            <div class="section-label" id="failWhatIfLabel" hidden>如果目標更早呢?— 示範</div>
+            <p class="caption" id="failDemoNote" hidden>示範:假設希望 56 歲前退休 — 下方缺口圖與三條路照此假設重算。</p>
             <div class="card chart-card">
               <svg viewBox="0 0 340 120" role="img" aria-label="資產線區間未達目標線">
                 <path d="M12 26 H328" stroke="var(--warn)" stroke-width="1.5" stroke-dasharray="5 4"/>
@@ -762,7 +772,7 @@ footer.demo-foot{
           <div class="appbar">
             <span class="title">追蹤</span>
             <span class="spacer"></span>
-            <span class="caption">更新於 2026/07/18</span>
+            <span class="caption" id="trackAsof">更新於 2026/07/20</span>
           </div>
           <div class="body">
             <div class="hero">
@@ -782,6 +792,7 @@ footer.demo-foot{
             </div>
             <div class="card ledger" id="trackRows"></div>
             <p class="caption">每筆來自帳本交易紀錄,像存摺一樣 — 印出來的才算數。</p>
+            <p class="caption">資料來源:進度與投入為帳本實際紀錄;圖中軌跡帶為合成示範資料之模擬(通膨 2%/年),非未來機率保證。 <button class="link" data-go="s-method" style="font-size:inherit">方法與資料來源 →</button></p>
           </div>
         </section>
 
@@ -790,7 +801,7 @@ footer.demo-foot{
           <div class="appbar">
             <span class="title">帳本</span>
             <span class="spacer"></span>
-            <span class="caption">更新於 2026/07/20</span>
+            <span class="caption" id="lgAsof">更新於 2026/07/20</span>
           </div>
           <div class="body">
             <div class="hero">
@@ -985,6 +996,7 @@ footer.demo-foot{
             <p class="caption">同參數對照,非優劣排序;歷史樣本不代表未來,兩檔樣本期間長度不同(0050:276 月/0056:216 月)。殖利率假設一律 3%(示範),高股息型實際稅費 drag 會更高。</p>
             <div class="section-label">個股?</div>
             <p class="caption">個股僅提供確定性試算(單一假設),計算方式與 ETF 的機率區間不同,不納入本頁對照。</p>
+            <p class="caption">資料來源:合成示範資料 · 實質報酬試算(通膨 2%/年)· P10–P90 為歷史區間,非未來機率保證。 <button class="link" data-go="s-method" style="font-size:inherit">方法與資料來源 →</button></p>
             <div class="btn-row"><button class="btn ghost" data-go="s-decum">查看提領期(概念)→</button></div>
           </div>
         </section>
@@ -1030,6 +1042,7 @@ footer.demo-foot{
               <div class="row"><span class="k">樂觀(90% 情境在此之前用罄)</span><span class="v mono" id="decumP90">—</span></div>
             </div>
             <p class="caption" id="decumStartNote">未來功能預覽,僅適用 ETF 類;「用罄」= 資產歸零;100+ 表示 60 年模擬期內未用罄。</p>
+            <p class="caption">資料來源:合成示範資料 · 實質報酬試算(通膨 2%/年)· P10–P90 為歷史區間,非未來機率保證。 <button class="link" data-go="s-method" style="font-size:inherit">方法與資料來源 →</button></p>
           </div>
         </section>
 
@@ -1551,18 +1564,24 @@ footer.demo-foot{
     var target = currentTarget();
     var userWish = wishAge();
     var a50Now = mAge(SIM.p50Months);
-    /* 目前計畫可達標(P50 ≤ 希望年齡)時本頁沒有真實缺口 — 明標示範狀態,不假裝失敗 */
+    /* 目前計畫可達標(P50 ≤ 希望年齡)時本頁沒有真實缺口 — 真話先行:
+       hero 直述「希望年齡前可達標」,what-if(更早的假設年齡)降為明標示範區塊 */
     var demo = !(a50Now > userWish);
     var wish = demo ? Math.max(currentAge() + 1, Math.floor(a50Now) - 2) : userWish;
-    var demoNote = document.getElementById("failDemoNote");
-    if (demoNote) {
-      demoNote.hidden = !demo;
-      if (demo) demoNote.textContent = "示範狀態:假設希望 " + wish + " 歲前退休(你目前的計畫在 " + userWish + " 歲前可達標)。";
-    }
     var wishMonths = Math.round((wish - currentAge()) * 12);
     var realAnnual = Math.pow(1 + geoMonthly, 12) - 1; /* 合成樣本幾何平均(實質)*/
     var fv = E.futureValue({ targetAmount: target, currentAssets: currentAssets(), monthlyContribution: m, annualReturn: realAnnual }, wishMonths);
     var gapWan = Math.max(0, Math.round((target - fv) / 10000));
+    document.getElementById("failRealHero").hidden = demo;
+    document.getElementById("failDemoHero").hidden = !demo;
+    document.getElementById("failWhatIfLabel").hidden = !demo;
+    var demoNote = document.getElementById("failDemoNote");
+    demoNote.hidden = !demo;
+    if (demo) {
+      document.getElementById("failOkAge").innerHTML = userWish + '<span class="unit">歲</span>';
+      document.getElementById("failOkP50").textContent = "(中位數 " + fmtAge(a50Now) + " 歲)";
+      demoNote.textContent = "示範:假設希望 " + wish + " 歲前退休 — 到 " + wish + " 歲仍差 NT$ " + gapWan.toLocaleString("en-US") + " 萬,下方缺口圖與三條路照此假設重算。";
+    }
     document.getElementById("failAge").innerHTML = wish + '<span class="unit">歲</span>';
     document.getElementById("failGap").textContent = "NT$ " + gapWan.toLocaleString("en-US") + " 萬";
     var a1 = mAge(mcRun(m + 6000).p50Months);
@@ -1615,6 +1634,9 @@ footer.demo-foot{
     { date: "2026-07-01", symbol: "0056", assetClass: "etf",   type: "dividend", amount: 5600 }
   ];
   var LEDGER_PRICES = { "0050": 132, "0056": 35.2, "2330": 645 }; /* 手動輸入現價(Rule 7:Q2 前無行情源)*/
+  var LEDGER_ASOF = "2026-07-20"; /* 帳本資料基準日 — 追蹤/帳本「更新於」、XIRR 終值日、手動交易日期的單一來源 */
+  document.getElementById("trackAsof").textContent = "更新於 " + LEDGER_ASOF.replace(/-/g, "/");
+  document.getElementById("lgAsof").textContent = "更新於 " + LEDGER_ASOF.replace(/-/g, "/");
   function fmtNT(n){ return "NT$ " + Math.round(n).toLocaleString("en-US"); }
   function fmtSigned(n){ return (n >= 0 ? "+" : "−") + "NT$ " + Math.abs(Math.round(n)).toLocaleString("en-US"); }
   function fmtPct(x){ return (x >= 0 ? "+" : "−") + Math.abs(x * 100).toFixed(1) + "%"; }
@@ -1646,13 +1668,13 @@ footer.demo-foot{
       var pct = value > 0 ? Math.round((en.mv / value) * 100) : 0;
       hold += '<button class="row holding-row" data-sym="' + en.sym + '"><span class="k"><i class="sw" style="background:' + symColor(en.sym) + '"></i>' + en.sym + " · " + pct + '%</span><span class="v mono">' + fmtSigned(en.unreal) + " →</span></button>";
     });
-    hold += '<div class="row total"><span class="k">未實現損益合計</span><span class="v mono">' + fmtSigned(un.total) + "</span></div>";
+    hold += '<div class="row total pl"><span class="k">未實現損益合計</span><span class="v mono">' + fmtSigned(un.total) + "</span></div>";
     document.getElementById("lgHoldings").innerHTML = hold;
     document.getElementById("lgHoldings").querySelectorAll(".holding-row").forEach(function(b){
       b.addEventListener("click", function(){ openHolding(b.getAttribute("data-sym")); });
     });
     var flows = allTxns().map(function(t){ return { date: t.date, amount: E.transactionCashFlow(t, cfg) }; });
-    flows.push({ date: "2026-07-20", amount: value });
+    flows.push({ date: LEDGER_ASOF, amount: value });
     var rate = E.xirr(flows);
     document.getElementById("lgNaive").textContent = fmtPct(E.naiveTotalReturn(allTxns(), cfg, value));
     document.getElementById("lgXirr").textContent = rate == null ? "—" : fmtPct(rate) + "/年";
@@ -1869,8 +1891,8 @@ footer.demo-foot{
       if (!(price > 0)) { msg.style.color = "var(--err)"; msg.textContent = "調整未套用:現價需大於 0。"; return; }
       LEDGER_PRICES[sym] = price;
       var added = 0;
-      if (buy > 0) { USER_TXNS.push({ date: "2026-07-20", symbol: sym, assetClass: meta.assetClass || "etf", type: "buy", shares: buy, price: price }); added++; }
-      if (sell > 0) { USER_TXNS.push({ date: "2026-07-20", symbol: sym, assetClass: meta.assetClass || "etf", type: "sell", shares: sell, price: price }); added++; }
+      if (buy > 0) { USER_TXNS.push({ date: LEDGER_ASOF, symbol: sym, assetClass: meta.assetClass || "etf", type: "buy", shares: buy, price: price }); added++; }
+      if (sell > 0) { USER_TXNS.push({ date: LEDGER_ASOF, symbol: sym, assetClass: meta.assetClass || "etf", type: "sell", shares: sell, price: price }); added++; }
       try {
         E.buildLedgerSnapshot(allTxns(), { brokerFeeDiscount: 0.6 }); /* 賣超防護:交由引擎驗證 */
       } catch (err) {
@@ -2009,7 +2031,7 @@ footer.demo-foot{
       }
       errEl.hidden = true;
       /* 買進均價入帳,手續費由引擎另計(與明細頁加碼同口徑) */
-      USER_TXNS.push({ date: "2026-07-20", symbol: sym, assetClass: meta.assetClass, type: "buy", shares: shares, price: cost });
+      USER_TXNS.push({ date: LEDGER_ASOF, symbol: sym, assetClass: meta.assetClass, type: "buy", shares: shares, price: cost });
       LEDGER_PRICES[sym] = price;
       renderLedger();
       renderAutoDiv();
