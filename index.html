@@ -670,7 +670,7 @@ footer.demo-foot{
               </div>
             </div>
 
-            <p class="caption">資料來源:合成示範資料 · 實質報酬試算(通膨 2%/年)· P10–P90 為歷史區間,非未來機率保證。 <button class="link" data-go="s-method" style="font-size:inherit">方法與資料來源 →</button> <button class="link" data-go="s-compare" style="font-size:inherit">比較其他標的 →</button></p>
+            <p class="caption">資料來源:合成示範資料 · 實質報酬試算(通膨 2%/年)· P10–P90 為歷史區間,非未來機率保證。 <button class="link" data-go="s-method" style="font-size:inherit">方法與資料來源 →</button> <button class="link" data-go="s-compare" style="font-size:inherit">比較其他標的 →</button> <button class="link" id="h4Entry" data-go="s-h4" data-h4from="result" style="font-size:inherit" hidden>持續對齊 →</button></p>
             <p class="vh" id="liveResult" aria-live="polite"></p><!-- SR 摘要:滑桿 change 後宣告 P90/P50/P10 與提醒 -->
           </div>
         </section>
@@ -805,6 +805,14 @@ footer.demo-foot{
               </svg>
             </div>
             <div class="card ledger" id="trackRows"></div>
+            <div id="h4TrackEntry" hidden><!-- H4 主入口:對齊的痛點時刻在偏航,不在首算(訪談 Insight 1) -->
+              <div class="section-label">持續對齊(構想)</div>
+              <div class="card ledger">
+                <div class="row"><span class="k">偏航監測:落後或超前,主動告訴你</span><span class="v mono">＋</span></div>
+                <div class="row"><span class="k">回檔、調薪之後,一鍵重新對齊計畫</span><span class="v mono">＋</span></div>
+              </div>
+              <div class="btn-row"><button class="btn ghost" data-go="s-h4" data-h4from="track">了解持續對齊 →</button></div>
+            </div>
             <p class="caption">每筆來自帳本交易紀錄,像存摺一樣 — 印出來的才算數。</p>
             <p class="caption">資料來源:進度與投入為帳本實際紀錄;圖中軌跡帶為合成示範資料之模擬(通膨 2%/年),非未來機率保證。 <button class="link" data-go="s-method" style="font-size:inherit">方法與資料來源 →</button></p>
           </div>
@@ -1096,6 +1104,47 @@ footer.demo-foot{
           </div>
         </section>
 
+        <!-- 18 持續對齊(H4 意向調查;App 流程入口由 ?h4=1 發射鎖控制)========= -->
+        <section class="screen" id="s-h4" data-name="持續對齊(實驗)">
+          <div class="appbar"><button class="link" data-go="s-result-etf">← 試算</button><span class="title" style="margin-left:8px">持續對齊</span><span class="spacer"></span><span class="chip">意向調查</span></div>
+          <div class="body">
+            <div class="hero">
+              <p class="lead">試算是一天的答案</p>
+              <div class="figure" style="font-size:26px;line-height:1.45">人生會變,<br>計畫需要跟著變。</div>
+              <p class="caption">回檔、調薪、制度變動 — 每一次變化之後,你的計畫還對得上嗎?</p>
+            </div>
+            <div class="section-label">誠實試算 — 永遠免費</div>
+            <div class="card ledger">
+              <div class="row"><span class="k">缺口引導、機率區間、含稅費試算</span><span class="v mono">✓</span></div>
+              <div class="row"><span class="k">參數隨時改、隨時手動重算</span><span class="v mono">✓</span></div>
+            </div>
+            <div id="h4PaidA">
+              <div class="section-label">持續對齊 — 讓計畫自己盯著自己</div>
+              <div class="card ledger">
+                <div class="row"><span class="k">偏航監測:落後或超前,主動告訴你</span><span class="v mono">＋</span></div>
+                <div class="row"><span class="k">事件重算:回檔、調薪紀錄後一鍵更新計畫</span><span class="v mono">＋</span></div>
+                <div class="row"><span class="k">年度誠實回顧:一年一頁,計畫 vs 實際</span><span class="v mono">＋</span></div>
+              </div>
+            </div>
+            <div id="h4PaidB" hidden>
+              <div class="section-label">持續對齊 — 更深的模擬</div>
+              <div class="card ledger">
+                <div class="row"><span class="k">波動壓力測試:用你的實際持倉,試歷史最壞情境</span><span class="v mono">＋</span></div>
+                <div class="row"><span class="k">深度提領規劃:接你的帳本與稅費設定,算錢夠花到幾歲</span><span class="v mono">＋</span></div>
+                <div class="row"><span class="k">多計畫並排:不同人生假設存成多份計畫,一眼對照</span><span class="v mono">＋</span></div>
+              </div>
+            </div>
+            <div class="btn-row"><button class="btn primary" id="h4Cta">解鎖持續對齊 · <span class="mono" id="h4Price">NT$ 990</span>/年</button></div>
+            <div class="risk-block" id="h4Reveal" hidden>
+              <div class="rb-title">這個功能還沒推出</div>
+              <span>這一頁是意向調查:我們想知道「持續對齊」值不值得做。價格為調查用途、尚未定案,不會請你付款。留下 email,推出時第一批通知你。</span>
+              <div class="btn-row" style="margin-top:10px"><button class="btn ghost" id="h4Waitlist" hidden>加入通知名單</button></div>
+              <p class="caption" id="h4NoForm" style="margin:6px 0 0">通知名單尚未開放。</p>
+            </div>
+            <p class="caption">免費層永遠可完整重算誠實數字 — 付費內容是自動化與持續性,不是真相。Email 僅用於推出通知,不會與任何財務輸入連結。</p>
+          </div>
+        </section>
+
         <nav class="tabbar" aria-label="主要導覽">
           <button data-go="s-result-etf" data-tab="calc" aria-current="page">試算</button>
           <button data-go="s-track" data-tab="track">追蹤</button>
@@ -1243,7 +1292,7 @@ footer.demo-foot{
     li.appendChild(b); nav.appendChild(li);
   });
   var TAB_OF = {
-    "s-result-etf": "calc", "s-result-stock": "calc", "s-fail": "calc",
+    "s-result-etf": "calc", "s-result-stock": "calc", "s-fail": "calc", "s-h4": "calc",
     "s-track": "track", "s-ledger": "ledger", "s-settings": "settings"
   };
   /* 延後渲染:slider input 只更新可見畫面,離屏畫面標記 dirty,於進入時補算(G)*/
@@ -1291,6 +1340,9 @@ footer.demo-foot{
     });
     renderDirtyFor(screens[i].id); /* 進入畫面時補算被延後的渲染 */
     if (screens[i].id === "s-fail") renderFail(); /* 任何入口(側欄/深連/tab)都反映當前參數與希望年齡 */
+    if (screens[i].id === "s-h4") document.dispatchEvent(new Event("h4shown")); /* H4 曝光計數(init 前的深連由 isActive 補) */
+    if (qs.get("h4") === "1" && (screens[i].id === "s-result-etf" || screens[i].id === "s-track"))
+      document.dispatchEvent(new Event("h4entry")); /* 漏斗第一層:入口曝光 */
     if (!reduced) {
       screens[i].querySelectorAll(".printline").forEach(function(p){
         var c = p.cloneNode(true); p.parentNode.replaceChild(c, p);
@@ -1982,6 +2034,60 @@ footer.demo-foot{
     document.getElementById("tourPrev").addEventListener("click", function(){ tourIdx = Math.max(0, tourIdx - 1); showTour(); });
     document.getElementById("tourExit").addEventListener("click", function(){ bar.remove(); });
     showTour();
+  }
+
+  /* ── H4 付費假門(retirelab docs/discovery/07;意向調查)──────────────────
+     誠實鐵律:點擊即揭露、無任何付款流程、僅收 email(表單另設)。
+     發射鎖:App 流程入口僅於 ?h4=1 顯示(側欄/深連仍可達,供設計審閱)。
+     量測:僅計數/枚舉(Rule 3)— console + sessionStorage;endpoint 設定時 sendBeacon。 */
+  var H4CFG = { formUrl: "", endpoint: "" }; /* 發射前填:通知名單表單 URL / 計數端點 */
+  var h4Src = qs.get("src") || "direct";
+  function h4Assign(key, values){
+    var v = sessionStorage.getItem(key);
+    if (values.indexOf(v) < 0) { v = values[Math.floor(Math.random() * values.length)]; sessionStorage.setItem(key, v); }
+    return v;
+  }
+  var h4Price = h4Assign("h4price", ["990", "1490"]);   /* 價格 A/B */
+  var h4Variant = h4Assign("h4var", ["auto", "depth"]); /* 分層內容 A/B(red-team #4) */
+  document.getElementById("h4Price").textContent = "NT$ " + Number(h4Price).toLocaleString("en-US");
+  document.getElementById("h4PaidA").hidden = h4Variant !== "auto";
+  document.getElementById("h4PaidB").hidden = h4Variant !== "depth";
+  var h4From = "deep"; /* 漏斗來源:result | track | deep(深連/側欄) */
+  function h4Track(name){
+    var k = "h4_" + name;
+    sessionStorage.setItem(k, String(Number(sessionStorage.getItem(k) || 0) + 1));
+    var payload = JSON.stringify({ e: name, price: h4Price, variant: h4Variant, src: h4Src, from: h4From });
+    if (window.console) console.log("[h4]", payload);
+    if (H4CFG.endpoint && navigator.sendBeacon) navigator.sendBeacon(H4CFG.endpoint, payload);
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-go="s-h4"][data-h4from]'), function(b){
+    b.addEventListener("click", function(){ h4From = b.dataset.h4from; });
+  });
+  if (qs.get("h4") === "1") {
+    document.getElementById("h4Entry").hidden = false;      /* 次入口:結果頁 */
+    document.getElementById("h4TrackEntry").hidden = false; /* 主入口:追蹤頁(對齊的痛點所在) */
+  }
+  var h4Seen = false, h4EntrySeen = false;
+  function h4Viewed(){ if (!h4Seen) { h4Seen = true; h4Track("paywall_viewed"); } }
+  function h4EntryViewed(){ if (!h4EntrySeen) { h4EntrySeen = true; h4Track("entry_viewed"); } }
+  document.addEventListener("h4shown", h4Viewed);
+  document.addEventListener("h4entry", h4EntryViewed);
+  if (isActive("s-h4")) h4Viewed(); /* 深連 ?s=18:show() 先於本區塊執行 */
+  if (qs.get("h4") === "1" && (isActive("s-result-etf") || isActive("s-track"))) h4EntryViewed();
+  document.getElementById("h4Cta").addEventListener("click", function(){
+    h4Track("cta_clicked");
+    var rv = document.getElementById("h4Reveal");
+    rv.hidden = false;
+    rv.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "nearest" });
+  });
+  if (H4CFG.formUrl) {
+    var h4Wb = document.getElementById("h4Waitlist");
+    h4Wb.hidden = false;
+    document.getElementById("h4NoForm").hidden = true;
+    h4Wb.addEventListener("click", function(){
+      h4Track("waitlist_clicked");
+      window.open(H4CFG.formUrl, "_blank", "noopener");
+    });
   }
 
   /* 持股輸入(F-12:手動持股 → 帳本 → 試算起點;標的清單來自 fixtures metadata,Rule 2) */

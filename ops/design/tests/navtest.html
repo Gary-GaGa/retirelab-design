@@ -202,6 +202,24 @@ document.getElementById("f").addEventListener("load", function(){
       var okS = st && st.querySelectorAll("i").length === 4 && onN === i + 2 && !doc.querySelector("#" + id + " .appbar .caption");
       results.push((okS ? "PASS" : "FAIL") + " " + id + " 進度條 .steps(" + (i + 2) + "/4 亮起,appbar 分數已移除)");
     });
+    /* H4 假門(retirelab docs/discovery/07):發射鎖 + 價格/分層 A/B + 誠實揭露 */
+    var h4e = doc.getElementById("h4Entry");
+    results.push((h4e && h4e.hidden ? "PASS" : "FAIL") + " H4 結果頁入口未帶 ?h4=1 → 預設隱藏(發射鎖)");
+    var h4t = doc.getElementById("h4TrackEntry");
+    results.push((h4t && h4t.hidden ? "PASS" : "FAIL") + " H4 追蹤頁主入口未帶 ?h4=1 → 預設隱藏(發射鎖)");
+    click(doc, 'nav.screens ol li:nth-child(18) button'); assertScreen(doc, "s-h4", "側欄→持續對齊(實驗)");
+    var hp = doc.getElementById("h4Price").textContent;
+    results.push((/NT\$ (990|1,490)$/.test(hp) ? "PASS" : "FAIL") + " 價格 A/B 已指派(990 或 1,490,實得 " + hp + ")");
+    var vA = doc.getElementById("h4PaidA"), vB = doc.getElementById("h4PaidB");
+    results.push((vA.hidden !== vB.hidden ? "PASS" : "FAIL") + " 分層內容 A/B 恰一組顯示");
+    results.push((doc.getElementById("h4Reveal").hidden ? "PASS" : "FAIL") + " 誠實揭露面板預設隱藏(CTA 前不出現)");
+    click(doc, "#h4Cta");
+    var h4rv = !doc.getElementById("h4Reveal").hidden
+      && doc.getElementById("s-h4").textContent.indexOf("還沒推出") >= 0
+      && doc.getElementById("s-h4").textContent.indexOf("不會請你付款") >= 0;
+    results.push((h4rv ? "PASS" : "FAIL") + " CTA→誠實揭露(還沒推出/不會請你付款)");
+    results.push((doc.getElementById("h4Waitlist").hidden ? "PASS" : "FAIL") + " 表單未設定 → 通知名單按鈕隱藏(無假入口)");
+    click(doc, '#s-h4 [data-go="s-result-etf"]'); assertScreen(doc, "s-result-etf", "持續對齊←返回試算");
     var pass = results.filter(function(r){ return r.indexOf("FAIL") === 0; }).length === 0;
     document.getElementById("out").textContent =
       "NAVTEST " + (pass ? "ALL-PASS" : "HAS-FAIL") + "\n" + results.join("\n");
