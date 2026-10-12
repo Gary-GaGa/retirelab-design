@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head><meta charset="utf-8"><title>interactiontest</title></head>
+<body>
+<pre id="out">running…</pre>
+<iframe id="f" src="/index.html?app=1&amp;s=7" width="390" height="844" title="ETF 結果互動測試"></iframe>
+<script>
+/* 使用真的 DOM 與動畫時間驗證最後選擇,不讀取實作內部狀態。 */
+var results = [];
+function check(ok, label){ results.push((ok ? "PASS" : "FAIL") + " " + label); }
+function pause(ms){ return new Promise(function(resolve){ setTimeout(resolve, ms); }); }
+document.getElementById("f").addEventListener("load", async function(){
+  var doc = this.contentDocument, win = this.contentWindow;
+  var simple = doc.getElementById("etfSimple"), adv = doc.getElementById("etfAdv");
+  function pointer(id){ doc.getElementById(id).dispatchEvent(new win.MouseEvent("click", {bubbles:true, detail:1})); }
+  function settled(advOn, label){
+    var visible = advOn ? adv : simple, hidden = advOn ? simple : adv;
+    check(!visible.hidden && hidden.hidden && win.getComputedStyle(visible).opacity === "1"
+      && doc.getElementById("modeAdv").getAttribute("aria-pressed") === String(advOn)
+      && doc.getElementById("modeSimple").getAttribute("aria-pressed") === String(!advOn), label);
+  }
+  try {
+    settled(false, "預設簡單模式:選取與可見內容一致");
+    check(doc.getElementById("etfHero").textContent === "58歲退休", "黃金情境仍為 58 歲退休");
+    pointer("modeAdv"); pointer("modeSimple");
+    await pause(600);
+    settled(false, "簡單→進階→簡單快速反悔,最後選擇勝出");
+    pointer("modeAdv");
+    await pause(600);
+    settled(true, "一般指標切換仍能完成");
+    pointer("modeSimple"); pointer("modeAdv");
+    await pause(600);
+    settled(true, "進階→簡單→進階快速反悔,最後選擇勝出");
+    pointer("modeSimple"); await pause(300); pointer("modeAdv");
+    await pause(600);
+    settled(true, "淡入階段反向切換,不留下透明內容");
+    pointer("modeSimple"); pointer("modeAdv"); pointer("modeSimple"); pointer("modeAdv");
+    await pause(600);
+    settled(true, "連續切換只保留最後意圖");
+    pointer("modeSimple"); await pause(120);
+    doc.getElementById("modeAdv").click();
+    settled(true, "鍵盤接管尚未完成的指標切換時也立即呈現");
+    await pause(600);
+    settled(true, "被鍵盤接管的舊計時器不再改寫畫面");
+    doc.getElementById("modeSimple").focus();
+    doc.getElementById("modeSimple").click(); /* 鍵盤/輔具 activation 的 detail=0 */
+    settled(false, "鍵盤/輔具 activation 同步呈現,不用等待動畫");
+    check(doc.activeElement.id === "modeSimple", "切換後焦點保留在操作按鈕");
+    doc.getElementById("modeAdv").click();
+    settled(true, "鍵盤/輔具 activation 可同步返回進階");
+    var reduced = win.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (new URLSearchParams(location.search).get("motion") === "reduce") {
+      check(reduced, "瀏覽器確實啟用 reduced-motion(非略過驗證)");
+    }
+    if (reduced) {
+      pointer("modeSimple"); settled(false, "reduced-motion 指標切換立即完成");
+      pointer("modeAdv"); settled(true, "reduced-motion 返回立即完成");
+    }
+    var range = doc.getElementById("advRange");
+    check(range.getBoundingClientRect().height >= 44, "每月投入滑桿觸控高度至少 44px");
+    var before = doc.getElementById("fanP50").getAttribute("d");
+    var liveBefore = doc.getElementById("liveResult").textContent;
+    range.value = 30000; range.dispatchEvent(new win.Event("input", {bubbles:true}));
+    check(doc.getElementById("advOut").textContent.indexOf("30,000") >= 0
+      && doc.getElementById("investRange").value === "30000"
+      && doc.getElementById("fanP50").getAttribute("d") !== before, "調整投入:金額、計畫值與圖表同步");
+    check(doc.getElementById("liveResult").textContent === liveBefore, "拖動時不重複宣告結果摘要");
+    range.dispatchEvent(new win.Event("change", {bubbles:true}));
+    check(doc.getElementById("liveResult").textContent.indexOf("P50") >= 0, "定值後更新結果摘要");
+    check(doc.querySelector(".screen.active").id === "s-result-etf", "調整過程不強制跳頁");
+    range.value = 15000; range.dispatchEvent(new win.Event("input", {bubbles:true}));
+    range.dispatchEvent(new win.Event("change", {bubbles:true}));
+    check(doc.getElementById("etfHero").textContent === "58歲退休", "還原投入後回到黃金值");
+  } catch (error) { check(false, error.message); }
+  document.getElementById("out").textContent = "INTERACTIONTEST "
+    + (results.some(function(r){ return r.indexOf("FAIL") === 0; }) ? "HAS-FAIL" : "ALL-PASS")
+    + "\n" + results.join("\n");
+});
+</script>
+</body>
+</html>
