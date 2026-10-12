@@ -245,7 +245,7 @@ nav.screens button[aria-current="true"] .no{color:var(--a1)}
 .slider-row{display:flex;flex-direction:column;gap:6px;padding:4px 6px}
 .slider-row .lab{display:flex;font-size:13px;color:var(--ink-soft)}
 .slider-row .lab output{margin-left:auto;font-family:var(--mono);font-weight:700;color:var(--ink)}
-input[type="range"]{width:100%;accent-color:var(--a1);height:28px}
+input[type="range"]{width:100%;accent-color:var(--a1);height:44px}
 .sim-state{font-size:11.5px;color:var(--ink-faint)} /* 整句用內文字體;mono 僅限句中數字(spec:mono for figures only) */
 .sim-state.live{color:var(--ink-soft)}
 .fail-link:not([hidden]){
@@ -1165,7 +1165,8 @@ footer.demo-foot{
 <script>
 (function(){
   "use strict";
-  var reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var motionPreference = matchMedia("(prefers-reduced-motion: reduce)");
+  var reduced = motionPreference.matches;
 
   /* ── 真引擎接線:RetireLabEngine(@retirelab/engine demo bundle,engine.js)──
      全部本地運算;fixtures 合成資料(Rule 7);實質報酬 = 名目 ÷ 通膨(示範假設 2%/年)。
@@ -1483,25 +1484,38 @@ footer.demo-foot{
   /* 結果 ETF:簡單/進階 --------------------------------------------------- */
   var mS = document.getElementById("modeSimple"), mA = document.getElementById("modeAdv");
   var simple = document.getElementById("etfSimple"), adv = document.getElementById("etfAdv");
+  var modeTimer = 0, modeFrame = 0;
+  function settleMode(advOn){
+    simple.style.transition = "none"; adv.style.transition = "none";
+    simple.hidden = advOn; adv.hidden = !advOn;
+    simple.style.opacity = "1"; adv.style.opacity = "1";
+  }
   function setMode(advOn, instant){
+    /* 每次選擇接管尚未完成的切換;舊 callback 不得蓋過最後一次意圖。 */
+    clearTimeout(modeTimer); cancelAnimationFrame(modeFrame);
     mS.setAttribute("aria-pressed", String(!advOn));
     mA.setAttribute("aria-pressed", String(advOn));
     var showEl = advOn ? adv : simple, hideEl = advOn ? simple : adv;
-    if (!showEl.hidden && hideEl.hidden) return;
-    if (instant || reduced) {
-      hideEl.hidden = true; showEl.hidden = false; showEl.style.opacity = "1";
+    if (instant || reduced || (!showEl.hidden && hideEl.hidden)) {
+      settleMode(advOn);
       return;
     }
     /* §6: mode toggle cross-fades the chart region only */
+    simple.style.transition = ""; adv.style.transition = "";
     hideEl.style.opacity = "0";
-    setTimeout(function(){
+    modeTimer = setTimeout(function(){
       hideEl.hidden = true;
+      hideEl.style.opacity = "1";
       showEl.style.opacity = "0"; showEl.hidden = false;
-      requestAnimationFrame(function(){ showEl.style.opacity = "1"; });
+      modeFrame = requestAnimationFrame(function(){ showEl.style.opacity = "1"; });
     }, 250);
   }
-  mS.addEventListener("click", function(){ setMode(false); });
-  mA.addEventListener("click", function(){ setMode(true); });
+  mS.addEventListener("click", function(e){ setMode(false, e.detail === 0); });
+  mA.addEventListener("click", function(e){ setMode(true, e.detail === 0); });
+  motionPreference.addEventListener("change", function(e){
+    reduced = e.matches;
+    if (reduced) setMode(mA.getAttribute("aria-pressed") === "true", true);
+  });
   if (qs.get("mode") === "adv") setMode(true, true);
 
   /* 進階:快速估算 slider -------------------------------------------------- */

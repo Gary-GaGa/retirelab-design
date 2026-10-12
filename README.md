@@ -7,6 +7,7 @@ Live Demo:https://gary-gaga.github.io/retirelab-design/
 
 | 匯出日期 | 檔案 | 對應 PRD 版本 | 涵蓋畫面 / 備註 |
 |---|---|---|---|
+| 2026-10-13 | index.html(結果互動修正) | PRD v0.8,沿用既有規格 | 簡單/進階快速反向切換取消舊動畫 callback,最後一次選擇與內容一致;鍵盤/輔具 activation 立即切換;減少動態效果偏好開啟時完成當前切換;滑桿命中高度 44px。引擎、文案、預設情境維持原樣。新增 `interactiontest.html` 互動回歸入口 |
 | 2026-07-27 | index.html(H4 付費假門 v2) | 新題目 PRD v0.2(retirelab docs/discovery/08)+ 07 實驗規格 v2 | 共 18 畫面。新增第 18 畫面「持續對齊(實驗)」:意向調查頁 — 免費/付費對照(價格 A/B 990/1,490 + 分層內容 A/B 自動化型/引擎深度型,session 隨機;B 型文案與 demo 免費內容區隔)、CTA→誠實揭露面板(還沒推出/不會請你付款,07 鐵律)、通知名單按鈕(表單未設定時隱藏,無假入口)。**雙入口 + 發射鎖 `?h4=1`**:主入口=追蹤頁上鎖卡(對齊痛點在偏航,訪談 Insight 1)、次入口=結果頁連結(無「即將推出」預告,揭露留在 CTA 後);量測為四層漏斗僅計數 `entry_viewed→paywall_viewed{from}→cta_clicked→waitlist`(console/sessionStorage,`H4CFG.endpoint` 可接 beacon);文案登錄主 repo copy-registry `h4.*` 27 條(draft)。零新 token;navtest 增 9 項(79 項 ALL-PASS)、audit_tokens 歸零 |
 | 2026-07-23 | index.html + DESIGN_SPEC Iteration 2(critique v2 33/40 修復) | PRD v0.8 ⑨ | 第二輪 dual-agent critique(A 實截 14 畫面)後修復:①spec gated amendment — 深色 P10 專用 token A2D #2E8168(原 A2 深底 1.35:1 不可見);②P0 合成資料標示第二層 — 比較/提領期/追蹤三頁補齊;③onboarding s3–s6 加「← 上一步」;④s-fail 示範態真話先行(hero=可達標事實,what-if 降次層);⑤結果頁前提列(目標/月投入/起算年齡動態);⑥a11y — 主題切換 role=switch、slider output for+aria-valuetext、損益 SR 讀「負」、caption 連結 44px 熱區、chips 熱區淨空 4px;⑦市值型 ETF/權值股 gloss、公式改「× 12 ÷ 提領率」、s4–s6 補 steps 進度條、損益 total 改墨、同源日期單一常數。黃金值不變;navtest 70 項 ALL-PASS |
 | 2026-07-23 | index.html(critique 32/40 全清單修復) | PRD v0.8 ⑧ | Impeccable dual-agent critique(快照 `.impeccable/critique/`)後五階段修復:①誠信+文案 — 個股/無法達標頁補合成資料標示、設定頁「隨時可改」承諾落地(試算參數列可點回缺口引導)、加入帳本/賣超改白話就地錯誤、hero caption 修破碎中文、F-xx 內部代號清出使用者文案;②目標頁「希望幾歲前退休」滑桿(50–75 預設 60)— fail 判定改用自選年齡、無法達標提醒兩種模式就地出現、個股報酬 2–10% 可調(接引擎 solveMonths);③a11y+效能 — aria-live 結果播報、tabbar 改 nav 語意、P90 標籤對比 AA、觸控目標 44px、MC memoize+離屏延算(拖曳 60–100×);④polish — .link 全域樣式、mono 僅限數字、提領期強調改回 P50、標題層級;⑤終審修復 — s-fail 直開改示範狀態(不再「仍差 0 萬」)、個股頁就地提醒(無機率語句,連往調整計畫)。黃金值 58 歲/1,500 萬不變;navtest 50 項 ALL-PASS |
@@ -25,3 +26,14 @@ Live Demo:https://gary-gaga.github.io/retirelab-design/
 ## 更新流程
 
 Claude Design 匯出 standalone HTML → 舊 `index.html` 移入 `archive/vX.Y.html` → 新檔覆蓋 `index.html` → 上表加一列 → push(Pages 自動更新)。
+
+## 本機預覽與互動檢查
+
+在 repository 根目錄執行 `python3 -m http.server 8765 --bind 127.0.0.1`，開啟 `http://127.0.0.1:8765/?app=1&s=7&mode=adv` 可直接操作 ETF 結果頁。
+
+- `ops/design/tests/navtest.html`：既有導覽與引擎接線回歸，仍由 CI 執行。
+- `ops/design/tests/interactiontest.html`：在正常繪製的瀏覽器開啟，約 5 秒後應顯示 `INTERACTIONTEST ALL-PASS`；檢查快速反悔、連續切換、淡入中斷、鍵盤 activation、焦點及滑桿同步。測試會操作 iframe 內的示範資料。
+- 啟用瀏覽器/系統「減少動態效果」後，以 `interactiontest.html?motion=reduce` 再驗證；此入口也檢查偏好確實生效，避免跳過後誤報通過。
+- 色彩與字型契約：`python3 ops/design/scripts/audit_tokens.py --spec design/DESIGN_SPEC.md --src .`。
+
+互動測試會讀取動畫完成後的實際透明度，請勿使用舊導覽測試的 `--virtual-time-budget --dump-dom` 取代一般模式的繪製驗證：虛擬計時器與 compositor 的動畫時間可能不同步。實際 Enter/Space、方向鍵及手機觸控手感仍需另行操作檢查。
